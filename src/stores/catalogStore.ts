@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export type ProductCategory = 'mens' | 'womens' | 'kids';
 export type ProductSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | '2XL' | '3XL';
-export type ProductColor = 'White' | 'Black' | 'Green' | 'Red' | 'Blue' | 'Yellow';
+export type ProductColor = 'White' | 'Black' | 'Green' | 'Red' | 'Blue' | 'Yellow' | 'Pink';
 
 export interface Product {
   id: number;
