@@ -13,6 +13,8 @@ export interface Product {
   gender: 'men' | 'women' | 'unisex';
   image: string;
   priceUSD: number;
+  priceAED: number;
+  priceEGP: number;
   description: string;
   technology: string[];
   brand: string;
@@ -84,6 +86,8 @@ const sampleProducts: Product[] = [
     gender: 'men',
     image: '/assets/img/tee.jpg',
     priceUSD: 54.25,
+    priceAED: 199.09,
+    priceEGP: 1708.88,
     description: 'Premium cotton T-shirt with custom design options',
     technology: ['DTG', 'DTF'],
     brand: 'PrintaRex',
@@ -100,6 +104,8 @@ const sampleProducts: Product[] = [
     gender: 'men',
     image: '/assets/img/tee.jpg',
     priceUSD: 67.85,
+    priceAED: 248.99,
+    priceEGP: 2137.28,
     description: 'Athletic T-shirt perfect for custom sports designs',
     technology: ['DTG', 'DTF'],
     brand: 'PrintaRex',
@@ -116,6 +122,8 @@ const sampleProducts: Product[] = [
     gender: 'men',
     image: '/assets/img/hoodie.jpg',
     priceUSD: 89.99,
+    priceAED: 330.26,
+    priceEGP: 2834.69,
     description: 'Premium cotton hoodie with custom design options',
     technology: ['DTG', 'DTF', 'Embroidery'],
     brand: 'PrintaRex',
@@ -134,6 +142,8 @@ const sampleProducts: Product[] = [
     gender: 'women',
     image: '/assets/img/tee.jpg',
     priceUSD: 54.25,
+    priceAED: 199.09,
+    priceEGP: 1708.88,
     description: 'Comfortable women\'s T-shirt for custom designs',
     technology: ['DTG', 'Embroidery'],
     brand: 'PrintaRex',
@@ -150,6 +160,8 @@ const sampleProducts: Product[] = [
     gender: 'women',
     image: '/assets/img/tee.jpg',
     priceUSD: 67.85,
+    priceAED: 248.99,
+    priceEGP: 2137.28,
     description: 'Stylish women\'s T-shirt with modern fit',
     technology: ['DTG', 'Embroidery'],
     brand: 'PrintaRex',
@@ -166,6 +178,8 @@ const sampleProducts: Product[] = [
     gender: 'women',
     image: '/assets/img/hoodie.jpg',
     priceUSD: 89.99,
+    priceAED: 330.26,
+    priceEGP: 2834.69,
     description: 'Comfortable women\'s hoodie for custom designs',
     technology: ['DTG', 'Embroidery'],
     brand: 'PrintaRex',
@@ -184,6 +198,8 @@ const sampleProducts: Product[] = [
     gender: 'unisex',
     image: '/assets/img/tee.jpg',
     priceUSD: 39.99,
+    priceAED: 146.76,
+    priceEGP: 1259.69,
     description: 'Comfortable kids\' T-shirt for custom designs',
     technology: ['DTG', 'DTF'],
     brand: 'PrintaRex',
@@ -200,6 +216,8 @@ const sampleProducts: Product[] = [
     gender: 'unisex',
     image: '/assets/img/hoodie.jpg',
     priceUSD: 69.99,
+    priceAED: 256.86,
+    priceEGP: 2204.69,
     description: 'Warm and cozy kids\' hoodie for custom designs',
     technology: ['DTG', 'DTF'],
     brand: 'PrintaRex',
@@ -216,6 +234,8 @@ const sampleProducts: Product[] = [
     gender: 'unisex',
     image: '/assets/img/tee.jpg',
     priceUSD: 44.99,
+    priceAED: 165.11,
+    priceEGP: 1417.19,
     description: 'Active kids\' T-shirt perfect for sports designs',
     technology: ['DTG', 'DTF'],
     brand: 'PrintaRex',

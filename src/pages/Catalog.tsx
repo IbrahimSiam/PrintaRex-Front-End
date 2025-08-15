@@ -14,7 +14,7 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCatalogStore } from '../stores/catalogStore';
 import { useUIStore } from '../stores/uiStore';
-import { formatCurrency, getCurrencySymbol } from '../utils/currency';
+
 
 interface TabPanelProps {
   children?: React.ReactNode;
