@@ -13,6 +13,8 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCatalogStore } from '../stores/catalogStore';
+import { useUIStore } from '../stores/uiStore';
+import { formatCurrency, getCurrencySymbol } from '../utils/currency';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -54,7 +56,9 @@ const Catalog: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarPinned, setSidebarPinned] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [shipFrom, setShipFrom] = useState('Egypt');
+  
+  // Get UI store for currency and shipFrom
+  const { shipFrom, setShipFrom, setCurrency } = useUIStore();
   
   // Try to access the store with error handling
   let catalogStoreData = null;
@@ -297,7 +301,7 @@ const Catalog: React.FC = () => {
                 </Box>
                 
                 <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
-                  ${product.priceUSD}
+                  {shipFrom === 'UAE' ? `AED ${product.priceAED || product.priceUSD * 3.67}` : `EGP ${product.priceEGP || product.priceUSD * 31.5}`}
                 </Typography>
                 
                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -406,6 +410,9 @@ const Catalog: React.FC = () => {
             <Typography variant="body1" sx={{ fontWeight: 500, color: '#374151' }}>
               Ships from:
             </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 400 }}>
+              (Currency: {shipFrom === 'UAE' ? 'AED' : 'EGP'})
+            </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Box
                 sx={{
@@ -424,7 +431,10 @@ const Catalog: React.FC = () => {
                     borderColor: 'rgba(25, 118, 210, 0.3)',
                   }
                 }}
-                onClick={() => setShipFrom('UAE')}
+                onClick={() => {
+                  setShipFrom('UAE');
+                  setCurrency('AED');
+                }}
               >
                 <span style={{ fontSize: '1rem' }}>🇦🇪</span>
                 <Typography
@@ -465,7 +475,10 @@ const Catalog: React.FC = () => {
                     borderColor: 'rgba(25, 118, 210, 0.3)',
                   }
                 }}
-                onClick={() => setShipFrom('Egypt')}
+                onClick={() => {
+                  setShipFrom('Egypt');
+                  setCurrency('EGP');
+                }}
               >
                 <span style={{ fontSize: '1rem' }}>🇪🇬</span>
                 <Typography
@@ -482,145 +495,7 @@ const Catalog: React.FC = () => {
             </Box>
           </Box>
 
-          {/* Popular to Customize Section */}
-          <Box sx={{ mb: 6 }}>
-            <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textAlign: 'center' }}>
-              Popular to Customize
-            </Typography>
-            <Grid container spacing={4} justifyContent="center">
-              {[
-                {
-                  name: 'T-Shirts',
-                  image: '/assets/img/tee.jpg',
-                  description: 'Premium cotton T-shirt with custom design options',
-                  productType: 'tshirt',
-                  categories: [
-                    { label: "Men's T-Shirts", path: '/app/catalog?gender=men&category=T-Shirts' },
-                    { label: "Women's T-Shirts", path: '/app/catalog?gender=women&category=T-Shirts' }
-                  ]
-                },
-                {
-                  name: 'Hoodies',
-                  image: '/assets/img/hoodie.jpg',
-                  description: 'Create unique hoodie designs',
-                  productType: 'hoodie',
-                  categories: [
-                    { label: "Men's Hoodies", path: '/app/catalog?gender=men&category=Hoodies' },
-                    { label: "Women's Hoodies", path: '/app/catalog?gender=women&category=Hoodies' }
-                  ]
-                }
-              ].map((product) => (
-                <Grid item xs={12} sm={6} md={4} key={product.name}>
-                  <Card
-                    sx={{
-                      height: '100%',
-                      borderRadius: 3,
-                      overflow: 'hidden',
-                      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                      cursor: 'pointer',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                      border: '1px solid #f3f4f6',
-                      '&:hover': {
-                        transform: 'translateY(-12px) scale(1.02)',
-                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                        borderColor: '#6366f1'
-                      }
-                    }}
-                    onClick={() => navigate(`/app/designer?product=${product.productType}`)}
-                  >
-                    <Box sx={{ height: 250, overflow: 'hidden' }}>
-                      <img
-                        src={product.image}
-                        alt={`${product.name} - customizable product`}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover'
-                        }}
-                        onError={(e) => console.error('Image failed to load:', e.currentTarget.src)}
-                      />
-                    </Box>
-                    <CardContent sx={{ p: 3 }}>
-                      <Typography
-                        variant="h5"
-                        component="h3"
-                        gutterBottom
-                        sx={{ fontWeight: 700, color: '#1f2937', fontSize: '1.25rem' }}
-                      >
-                        {product.name}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        color="text.secondary"
-                        sx={{ mb: 3, minHeight: '3rem', color: '#6b7280', lineHeight: 1.6 }}
-                      >
-                        {product.description}
-                      </Typography>
-                      
-                      {/* Category Navigation Buttons */}
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 3 }}>
-                        {product.categories.map((category) => (
-                          <Button
-                            key={category.path}
-                            variant="outlined"
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              navigate(category.path)
-                            }}
-                            sx={{
-                              textTransform: 'none',
-                              fontSize: '0.875rem',
-                              py: 0.75,
-                              px: 2,
-                              borderRadius: 2,
-                              borderColor: '#e5e7eb',
-                              color: '#6b7280',
-                              fontWeight: 500,
-                              '&:hover': {
-                                borderColor: '#6366f1',
-                                color: '#6366f1',
-                                backgroundColor: '#eff6ff'
-                              }
-                            }}
-                            aria-label={`Browse ${category.label}`}
-                          >
-                            {category.label}
-                          </Button>
-                        ))}
-                      </Box>
-                      
-                      <Button
-                        variant="contained"
-                        fullWidth
-                        size="medium"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          navigate(`/app/designer?product=${product.productType}`)
-                        }}
-                        sx={{
-                          borderRadius: 2,
-                          textTransform: 'none',
-                          fontWeight: 600,
-                          py: 1.5,
-                          backgroundColor: '#6366f1',
-                          '&:hover': {
-                            backgroundColor: '#4f46e5',
-                            transform: 'translateY(-1px)',
-                            boxShadow: '0 10px 25px rgba(99, 102, 241, 0.3)'
-                          },
-                          transition: 'all 0.2s ease-in-out'
-                        }}
-                        aria-label={`Customize ${product.name}`}
-                      >
-                        Customize Now
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
+
 
           {/* Category Tabs */}
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
