@@ -94,15 +94,17 @@ const Catalog: React.FC = () => {
   // Get category from URL params
   useEffect(() => {
     const category = searchParams.get('category');
-    if (category === 'hoodies') {
-      setSelectedTab('hoodies');
-    } else if (category === 'tshirts') {
-      setSelectedTab('tshirts');
+    if (category === 'womens') {
+      setSelectedTab('womens');
+    } else if (category === 'kids') {
+      setSelectedTab('kids');
+    } else {
+      setSelectedTab('mens');
     }
   }, [searchParams, setSelectedTab]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    const newTab = newValue === 0 ? 'tshirts' : 'hoodies';
+    const newTab = newValue === 0 ? 'mens' : newValue === 1 ? 'womens' : 'kids';
     setSelectedTab(newTab);
   };
 
@@ -500,7 +502,7 @@ const Catalog: React.FC = () => {
           {/* Category Tabs */}
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
             <Tabs
-              value={selectedTab === 'tshirts' ? 0 : 1}
+              value={selectedTab === 'mens' ? 0 : selectedTab === 'womens' ? 1 : 2}
               onChange={handleTabChange}
               aria-label="Product categories"
               sx={{
@@ -517,8 +519,9 @@ const Catalog: React.FC = () => {
                 },
               }}
             >
-              <Tab label="T-Shirts" {...a11yProps(0)} />
-              <Tab label="Hoodies" {...a11yProps(1)} />
+              <Tab label="Men's Clothing" {...a11yProps(0)} />
+              <Tab label="Women's Clothing" {...a11yProps(1)} />
+              <Tab label="Kids' Clothing" {...a11yProps(2)} />
             </Tabs>
           </Box>
 
@@ -548,7 +551,7 @@ const Catalog: React.FC = () => {
           )}
 
           {/* Products Grid */}
-          <TabPanel value={selectedTab === 'tshirts' ? 0 : 1} index={selectedTab === 'tshirts' ? 0 : 1}>
+          <TabPanel value={selectedTab === 'mens' ? 0 : selectedTab === 'womens' ? 1 : 2} index={selectedTab === 'mens' ? 0 : selectedTab === 'womens' ? 1 : 2}>
             {renderProducts()}
           </TabPanel>
         </Container>
