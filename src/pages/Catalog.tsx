@@ -401,33 +401,85 @@ const Catalog: React.FC = () => {
             </Box>
           </Box>
 
-          {/* Ship from Section */}
+          {/* Ships from Section */}
           <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="body1" sx={{ fontWeight: 500, color: '#374151' }}>
-              Ship from:
+              Ships from:
             </Typography>
-            <FormControl size="small" sx={{ minWidth: 140 }}>
-              <Select 
-                value={shipFrom} 
-                sx={{ 
-                  backgroundColor: 'white',
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 1,
-                    border: '1px solid #d1d5db'
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                  borderRadius: 2,
+                  px: 2,
+                  py: 1,
+                  border: '1px solid rgba(25, 118, 210, 0.2)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    backgroundColor: 'rgba(25, 118, 210, 0.12)',
+                    borderColor: 'rgba(25, 118, 210, 0.3)',
                   }
                 }}
-                onChange={(e) => setShipFrom(e.target.value)}
+                onClick={() => setShipFrom('UAE')}
               >
-                <MenuItem value="UAE" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <span style={{ fontSize: '1rem' }}>🇦🇪</span>
-                  <span>UAE</span>
-                </MenuItem>
-                <MenuItem value="Egypt" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <span style={{ fontSize: '1rem' }}>🇪🇬</span>
-                  <span>Egypt</span>
-                </MenuItem>
-              </Select>
-            </FormControl>
+                <span style={{ fontSize: '1rem' }}>🇦🇪</span>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: shipFrom === 'UAE' ? 'primary.main' : 'text.secondary',
+                    fontWeight: 500,
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  UAE
+                </Typography>
+              </Box>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  fontWeight: 400,
+                  mx: 0.5,
+                }}
+              >
+                •
+              </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                  borderRadius: 2,
+                  px: 2,
+                  py: 1,
+                  border: '1px solid rgba(25, 118, 210, 0.2)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    backgroundColor: 'rgba(25, 118, 210, 0.12)',
+                    borderColor: 'rgba(25, 118, 210, 0.3)',
+                  }
+                }}
+                onClick={() => setShipFrom('Egypt')}
+              >
+                <span style={{ fontSize: '1rem' }}>🇪🇬</span>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: shipFrom === 'Egypt' ? 'primary.main' : 'text.secondary',
+                    fontWeight: 500,
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  Egypt
+                </Typography>
+              </Box>
+            </Box>
           </Box>
 
           {/* Popular to Customize Section */}

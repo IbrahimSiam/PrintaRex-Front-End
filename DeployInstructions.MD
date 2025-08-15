@@ -20,9 +20,9 @@
 
 ### Step 1: Connect to VPS via SSH
 ```bash
-ssh isiam@31.97.188.46
+ssh root@31.97.188.46
 ```
-**Password**: `8uMRDDbg7AJNtOqmz9VH`
+**Password**: `8uMRDDbg7AJNtOqmz9VH@`
 
 ### Step 2: Update System and Install Dependencies
 ```bash
@@ -75,6 +75,13 @@ cd PrintaRex-Front-End
 # List files to verify
 ls -la
 ```
+sync the changes from GitHub to your server folder
+Option 1: Pull the latest changes (recommended)
+cd /home/ubuntu/PrintaRex-Front-End
+git pull origin main
+
+
+
 
 ### Step 5: Configure Docker Compose for Production
 The project already includes a production-ready `docker-compose.yml` file that:
@@ -88,6 +95,11 @@ The project already includes a production-ready `docker-compose.yml` file that:
 ```bash
 # Build and start the container
 sudo docker-compose up -d --build
+docker-compose build
+# or
+docker build -t printarex-frontend .
+
+
 
 # Check container status
 sudo docker ps
