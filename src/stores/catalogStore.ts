@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type ProductCategory = 'tshirts' | 'hoodies';
+export type ProductCategory = 'mens' | 'womens' | 'kids';
 export type ProductSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | '2XL' | '3XL';
 export type ProductColor = 'White' | 'Black' | 'Green' | 'Red' | 'Blue' | 'Yellow';
 
@@ -75,11 +75,11 @@ export type CatalogStore = CatalogState & CatalogActions;
 
 // Sample product data
 const sampleProducts: Product[] = [
-  // T-Shirts
+  // Men's Clothing
   {
     id: 1,
     name: 'Classic Men\'s T-Shirt',
-    category: 'tshirts',
+    category: 'mens',
     subcategory: 'T-Shirts',
     gender: 'men',
     image: '/assets/img/tee.jpg',
@@ -94,24 +94,8 @@ const sampleProducts: Product[] = [
   },
   {
     id: 2,
-    name: 'Premium Women\'s T-Shirt',
-    category: 'tshirts',
-    subcategory: 'T-Shirts',
-    gender: 'women',
-    image: '/assets/img/tee.jpg',
-    priceUSD: 54.25,
-    description: 'Comfortable women\'s T-shirt for custom designs',
-    technology: ['DTG', 'Embroidery'],
-    brand: 'PrintaRex',
-    colors: ['White', 'Black', 'Red'],
-    sizes: ['XS', 'S', 'M', 'L'],
-    inStock: true,
-    tags: ['premium', 'comfortable', 'fashion'],
-  },
-  {
-    id: 3,
     name: 'Men\'s Sport T-Shirt',
-    category: 'tshirts',
+    category: 'mens',
     subcategory: 'T-Shirts',
     gender: 'men',
     image: '/assets/img/tee.jpg',
@@ -125,9 +109,43 @@ const sampleProducts: Product[] = [
     tags: ['sport', 'athletic', 'performance'],
   },
   {
+    id: 3,
+    name: 'Classic Men\'s Hoodie',
+    category: 'mens',
+    subcategory: 'Hoodies',
+    gender: 'men',
+    image: '/assets/img/hoodie.jpg',
+    priceUSD: 89.99,
+    description: 'Premium cotton hoodie with custom design options',
+    technology: ['DTG', 'DTF', 'Embroidery'],
+    brand: 'PrintaRex',
+    colors: ['White', 'Black', 'Green'],
+    sizes: ['S', 'M', 'L', 'XL', '2XL'],
+    inStock: true,
+    tags: ['classic', 'cotton', 'warm'],
+  },
+  
+  // Women's Clothing
+  {
     id: 4,
+    name: 'Premium Women\'s T-Shirt',
+    category: 'womens',
+    subcategory: 'T-Shirts',
+    gender: 'women',
+    image: '/assets/img/tee.jpg',
+    priceUSD: 54.25,
+    description: 'Comfortable women\'s T-shirt for custom designs',
+    technology: ['DTG', 'Embroidery'],
+    brand: 'PrintaRex',
+    colors: ['White', 'Black', 'Red'],
+    sizes: ['XS', 'S', 'M', 'L'],
+    inStock: true,
+    tags: ['premium', 'comfortable', 'fashion'],
+  },
+  {
+    id: 5,
     name: 'Women\'s Fashion T-Shirt',
-    category: 'tshirts',
+    category: 'womens',
     subcategory: 'T-Shirts',
     gender: 'women',
     image: '/assets/img/tee.jpg',
@@ -141,43 +159,9 @@ const sampleProducts: Product[] = [
     tags: ['fashion', 'stylish', 'modern'],
   },
   {
-    id: 5,
-    name: 'Unisex Basic T-Shirt',
-    category: 'tshirts',
-    subcategory: 'T-Shirts',
-    gender: 'unisex',
-    image: '/assets/img/tee.jpg',
-    priceUSD: 48.77,
-    description: 'Versatile unisex T-shirt for all designs',
-    technology: ['DTG', 'DTF', 'Embroidery'],
-    brand: 'PrintaRex',
-    colors: ['White', 'Black'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL'],
-    inStock: true,
-    tags: ['unisex', 'versatile', 'basic'],
-  },
-  
-  // Hoodies
-  {
     id: 6,
-    name: 'Classic Men\'s Hoodie',
-    category: 'hoodies',
-    subcategory: 'Hoodies',
-    gender: 'men',
-    image: '/assets/img/hoodie.jpg',
-    priceUSD: 89.99,
-    description: 'Premium cotton hoodie with custom design options',
-    technology: ['DTG', 'DTF', 'Embroidery'],
-    brand: 'PrintaRex',
-    colors: ['White', 'Black', 'Green'],
-    sizes: ['S', 'M', 'L', 'XL', '2XL'],
-    inStock: true,
-    tags: ['classic', 'cotton', 'warm'],
-  },
-  {
-    id: 7,
     name: 'Premium Women\'s Hoodie',
-    category: 'hoodies',
+    category: 'womens',
     subcategory: 'Hoodies',
     gender: 'women',
     image: '/assets/img/hoodie.jpg',
@@ -190,21 +174,55 @@ const sampleProducts: Product[] = [
     inStock: true,
     tags: ['premium', 'comfortable', 'fashion'],
   },
+  
+  // Kids' Clothing
+  {
+    id: 7,
+    name: 'Kids\' Basic T-Shirt',
+    category: 'kids',
+    subcategory: 'T-Shirts',
+    gender: 'unisex',
+    image: '/assets/img/tee.jpg',
+    priceUSD: 39.99,
+    description: 'Comfortable kids\' T-shirt for custom designs',
+    technology: ['DTG', 'DTF'],
+    brand: 'PrintaRex',
+    colors: ['White', 'Black', 'Blue', 'Red'],
+    sizes: ['XS', 'S', 'M', 'L'],
+    inStock: true,
+    tags: ['kids', 'comfortable', 'fun'],
+  },
   {
     id: 8,
-    name: 'Unisex Sport Hoodie',
-    category: 'hoodies',
+    name: 'Kids\' Hoodie',
+    category: 'kids',
     subcategory: 'Hoodies',
     gender: 'unisex',
     image: '/assets/img/hoodie.jpg',
-    priceUSD: 79.99,
-    description: 'Athletic hoodie perfect for custom sports designs',
+    priceUSD: 69.99,
+    description: 'Warm and cozy kids\' hoodie for custom designs',
     technology: ['DTG', 'DTF'],
     brand: 'PrintaRex',
-    colors: ['White', 'Black', 'Blue'],
-    sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
+    colors: ['White', 'Black', 'Green', 'Pink'],
+    sizes: ['XS', 'S', 'M', 'L'],
     inStock: true,
-    tags: ['sport', 'athletic', 'performance'],
+    tags: ['kids', 'warm', 'cozy'],
+  },
+  {
+    id: 9,
+    name: 'Kids\' Sport T-Shirt',
+    category: 'kids',
+    subcategory: 'T-Shirts',
+    gender: 'unisex',
+    image: '/assets/img/tee.jpg',
+    priceUSD: 44.99,
+    description: 'Active kids\' T-shirt perfect for sports designs',
+    technology: ['DTG', 'DTF'],
+    brand: 'PrintaRex',
+    colors: ['White', 'Black', 'Blue', 'Yellow'],
+    sizes: ['XS', 'S', 'M', 'L'],
+    inStock: true,
+    tags: ['kids', 'sport', 'active'],
   },
 ];
 
@@ -221,12 +239,12 @@ export const useCatalogStore = create<CatalogStore>()(
   persist(
     (set, get) => ({
       // Initial state
-      selectedTab: 'tshirts',
+      selectedTab: 'mens',
       filtersPanelOpen: false,
       isLoading: false,
       filters: initialFilters,
       products: sampleProducts,
-      filteredProducts: sampleProducts.filter(p => p.category === 'tshirts'),
+      filteredProducts: sampleProducts.filter(p => p.category === 'mens'),
 
       // Tab Management
       setSelectedTab: (tab: ProductCategory) => {
