@@ -301,7 +301,10 @@ const Catalog: React.FC = () => {
                 </Box>
                 
                 <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
-                  {shipFrom === 'UAE' ? `AED ${product.priceAED || product.priceUSD * 3.67}` : `EGP ${product.priceEGP || product.priceUSD * 31.5}`}
+                  {shipFrom === 'UAE' 
+                    ? `AED ${(product.priceAED || product.priceUSD * 3.67).toFixed(2)}` 
+                    : `EGP ${(product.priceEGP || product.priceUSD * 31.5).toFixed(2)}`
+                  }
                 </Typography>
                 
                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -409,9 +412,6 @@ const Catalog: React.FC = () => {
           <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="body1" sx={{ fontWeight: 500, color: '#374151' }}>
               Ships from:
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 400 }}>
-              (Currency: {shipFrom === 'UAE' ? 'AED' : 'EGP'})
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Box
