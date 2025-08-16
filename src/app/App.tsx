@@ -10,6 +10,12 @@ import Landing from '../pages/Landing';
 import Catalog from '../pages/Catalog';
 import Designer from '../pages/Designer';
 import Checkout from '../pages/Checkout';
+import TShirts from '../pages/TShirts';
+import Hoodies from '../pages/Hoodies';
+import WomensTShirts from '../pages/WomensTShirts';
+import WomensHoodies from '../pages/WomensHoodies';
+import KidsTShirts from '../pages/KidsTShirts';
+import KidsHoodies from '../pages/KidsHoodies';
 import PlaceholderPage from '../components/PlaceholderPage';
 
 // Create RTL cache
@@ -57,6 +63,12 @@ const App: React.FC = () => {
           <Route path="/" element={<Landing />} />
           <Route path="/app/catalog" element={<Catalog />} />
           <Route path="/app/designer" element={<Designer />} />
+          <Route path="/app/t-shirts" element={<TShirts />} />
+          <Route path="/app/hoodies" element={<Hoodies />} />
+          <Route path="/app/womens-t-shirts" element={<WomensTShirts />} />
+          <Route path="/app/womens-hoodies" element={<WomensHoodies />} />
+          <Route path="/app/kids-t-shirts" element={<KidsTShirts />} />
+          <Route path="/app/kids-hoodies" element={<KidsHoodies />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/pricing" element={<PlaceholderPage title="Pricing" message="Pricing information will be available soon!" />} />
           <Route path="/support" element={<PlaceholderPage title="Support" message="Support center is coming soon!" />} />

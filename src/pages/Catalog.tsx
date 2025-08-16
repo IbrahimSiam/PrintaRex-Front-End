@@ -237,22 +237,41 @@ const Catalog: React.FC = () => {
       <Grid container spacing={3}>
         {filteredProducts.map((product) => (
           <Grid item xs={12} sm={6} md={4} key={product.id}>
-            <Card
-              sx={{
-                height: '100%',
-                borderRadius: 3,
-                overflow: 'hidden',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                cursor: 'pointer',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                border: '1px solid #f3f4f6',
-                '&:hover': {
-                  transform: 'translateY(-8px) scale(1.02)',
-                  boxShadow: '0 20px 40px -12px rgba(0, 0, 0, 0.25)',
-                  borderColor: theme.palette.primary.main,
-                },
-              }}
-            >
+                         <Card
+               onClick={() => {
+                 if (product.name === 'T-Shirts') {
+                   if (product.category === 'mens') {
+                     navigate('/app/t-shirts');
+                   } else if (product.category === 'womens') {
+                     navigate('/app/womens-t-shirts');
+                   } else if (product.category === 'kids') {
+                     navigate('/app/kids-t-shirts');
+                   }
+                 } else if (product.name === 'Hoodies') {
+                   if (product.category === 'mens') {
+                     navigate('/app/hoodies');
+                   } else if (product.category === 'womens') {
+                     navigate('/app/womens-hoodies');
+                   } else if (product.category === 'kids') {
+                     navigate('/app/kids-hoodies');
+                   }
+                 }
+               }}
+               sx={{
+                 height: '100%',
+                 borderRadius: 3,
+                 overflow: 'hidden',
+                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                 cursor: 'pointer',
+                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                 border: '1px solid #f3f4f6',
+                 '&:hover': {
+                   transform: 'translateY(-8px) scale(1.02)',
+                   boxShadow: '0 20px 40px -12px rgba(0, 0, 0, 0.25)',
+                   borderColor: theme.palette.primary.main,
+                 },
+               }}
+             >
               <Box sx={{ height: 250, overflow: 'hidden' }}>
                 <img
                   src={product.image || '/assets/img/tee.jpg'}
@@ -285,43 +304,64 @@ const Catalog: React.FC = () => {
                   {product.description}
                 </Typography>
                 
-                {/* Color Swatches */}
-                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                  {product.colors.slice(0, 3).map((color) => (
-                    <Box
-                      key={color}
-                      sx={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: '50%',
-                        bgcolor: color.toLowerCase(),
-                        border: '2px solid #fff',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                      }}
-                    />
-                  ))}
-                </Box>
+                {/* Only show color swatches if colors exist */}
+                {product.colors && product.colors.length > 0 && (
+                  <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                    {product.colors.slice(0, 3).map((color) => (
+                      <Box
+                        key={color}
+                        sx={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: '50%',
+                          bgcolor: color.toLowerCase(),
+                          border: '2px solid #fff',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        }}
+                      />
+                    ))}
+                  </Box>
+                )}
                 
-                <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
-                  {shipFrom === 'UAE' 
-                    ? `AED ${(product.priceAED || product.priceUSD * 3.67).toFixed(2)}` 
-                    : `EGP ${(product.priceEGP || product.priceUSD * 31.5).toFixed(2)}`
-                  }
-                </Typography>
+                {/* Only show price if it's not 0 */}
+                {product.priceUSD > 0 && (
+                  <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
+                    {shipFrom === 'UAE' 
+                      ? `AED ${(product.priceAED || product.priceUSD * 3.67).toFixed(2)}` 
+                      : `EGP ${(product.priceEGP || product.priceUSD * 31.5).toFixed(2)}`
+                    }
+                  </Typography>
+                )}
                 
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <Button 
-                    variant="contained" 
-                    size="small" 
-                    onClick={() => navigate(`/app/designer?productId=${product.id}`)}
-                    sx={{ flex: 1 }}
-                  >
-                    Customize
-                  </Button>
-                  <Button variant="outlined" size="small">
-                    Details
-                  </Button>
-                </Box>
+                                 <Box sx={{ display: 'flex', gap: 1 }}>
+                   <Button 
+                     variant="contained" 
+                     size="small" 
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       if (product.name === 'T-Shirts') {
+                         if (product.category === 'mens') {
+                           navigate('/app/t-shirts');
+                         } else if (product.category === 'womens') {
+                           navigate('/app/womens-t-shirts');
+                         } else if (product.category === 'kids') {
+                           navigate('/app/kids-t-shirts');
+                         }
+                       } else if (product.name === 'Hoodies') {
+                         if (product.category === 'mens') {
+                           navigate('/app/hoodies');
+                         } else if (product.category === 'womens') {
+                           navigate('/app/womens-hoodies');
+                         } else if (product.category === 'kids') {
+                           navigate('/app/kids-hoodies');
+                         }
+                       }
+                     }}
+                     sx={{ flex: 1 }}
+                   >
+                     Explore {product.name}
+                   </Button>
+                 </Box>
               </CardContent>
             </Card>
           </Grid>
