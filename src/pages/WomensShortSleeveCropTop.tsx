@@ -4,49 +4,17 @@ import {
   useTheme, useMediaQuery, AppBar, Toolbar, IconButton, Breadcrumbs, Link,
   Avatar, TextField, InputAdornment, Badge, Drawer, List, ListItem,
   ListItemIcon, ListItemText, Divider, Fab, Tooltip, ToggleButtonGroup,
-  ToggleButton, FormControl, InputLabel, Select, MenuItem, Tabs, Tab,
-  Paper, Rating, Stack
+  ToggleButton, FormControl, InputLabel, Select, MenuItem,
+  Paper, Rating, Stack, Accordion, AccordionSummary, AccordionDetails,
+  TableContainer, Table, TableBody, TableRow, TableCell, ButtonBase
 } from '@mui/material';
 import {
   Menu, Search, NotificationsNone, Settings, Home, ChevronLeft,
   ChevronRight, PushPin, PushPinOutlined, ArrowBack, LocalShipping,
-  CheckCircle, Star, ShoppingCart, Storefront
+  CheckCircle, Star, ShoppingCart, Storefront, ExpandMore
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../stores/uiStore';
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
 
 // Fulfillment Providers Section Component
 const FulfillmentProvidersSection: React.FC = () => {
@@ -381,6 +349,531 @@ const FulfillmentProvidersSection: React.FC = () => {
   );
 };
 
+// T-shirt icon component with shared outline and specific print areas
+const TShirtIcon: React.FC<{
+  area: string;
+  selected: boolean;
+}> = ({ area, selected }) => {
+  const outlineColor = selected ? '#1976d2' : '#424242'; // primary.main : grey.700
+  const dashColor = selected ? '#1976d2' : '#9e9e9e'; // primary.main : grey.500
+  
+  // Print area coordinates for each position
+  const printAreas = {
+    front: { x: 34, y: 30, w: 28, h: 32 },
+    back: { x: 34, y: 30, w: 28, h: 32 },
+    leftSleeve: { x: 22, y: 28, w: 10, h: 10 },
+    rightSleeve: { x: 64, y: 28, w: 10, h: 10 },
+    innerNeck: { x: 41, y: 22, w: 14, h: 8 },
+    outerNeck: { x: 38, y: 18, w: 20, h: 8 }
+  };
+  
+  const printArea = printAreas[area as keyof typeof printAreas];
+  
+  return (
+    <svg viewBox="0 0 96 96" width="96" height="96">
+      {/* shirt outline */}
+      <path
+        d="M32 18l16-8 16 8 10-6 8 12-10 6v44c0 3.3-2.7 6-6 6H30c-3.3 0-6-2.7-6-6V30l-10-6 8-12 10 6z"
+        fill="none" 
+        stroke={outlineColor} 
+        strokeWidth={2} 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+      {/* collar */}
+      <path 
+        d="M40 20c2.8 2.6 6.2 4 8 4s5.2-1.4 8-4" 
+        fill="none"
+        stroke={outlineColor} 
+        strokeWidth={2} 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+      {/* print area */}
+      <rect
+        x={printArea.x}
+        y={printArea.y}
+        width={printArea.w}
+        height={printArea.h}
+        fill="none"
+        stroke={dashColor}
+        strokeWidth={2}
+        strokeDasharray="4 3"
+        rx={2}
+      />
+    </svg>
+  );
+};
+
+// Print Areas Section Component
+const PrintAreasSection: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'DTG' | 'DTF'>('DTG');
+  const [selectedArea, setSelectedArea] = useState<string>('front');
+  
+  const AREAS = [
+    { key: 'front', label: 'Front' },
+    { key: 'back', label: 'Back' },
+    { key: 'leftSleeve', label: 'Left sleeve' },
+    { key: 'rightSleeve', label: 'Right sleeve' },
+    { key: 'innerNeck', label: 'Inner neck' },
+    { key: 'outerNeck', label: 'Outer neck' },
+  ];
+  
+  const TAB_AREAS = { DTG: AREAS, DTF: AREAS };
+  
+  const handleTabChange = (event: React.MouseEvent<HTMLElement>, newValue: 'DTG' | 'DTF') => {
+    if (newValue !== null) {
+      setActiveTab(newValue);
+      setSelectedArea('front'); // Reset selection when switching tabs
+    }
+  };
+  
+  const handleAreaSelect = (areaKey: string) => {
+    setSelectedArea(areaKey);
+  };
+  
+  return (
+    <Paper 
+      sx={{ 
+        border: '1px solid', 
+        borderColor: 'divider', 
+        borderRadius: 8, 
+        p: 2, 
+        mt: 2 
+      }}
+    >
+      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 3, color: 'text.primary' }}>
+        Print areas
+      </Typography>
+      
+      {/* DTG/DTF Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <ToggleButtonGroup
+          value={activeTab}
+          exclusive
+          onChange={handleTabChange}
+          aria-label="Print technology tabs"
+          sx={{
+            '& .MuiToggleButton-root': {
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              textTransform: 'none',
+              minHeight: 40,
+              px: 3
+            },
+            '& .MuiToggleButtonGroup-grouped': {
+              margin: 0,
+              border: 'none'
+            }
+          }}
+        >
+          <ToggleButton 
+            value="DTG" 
+            aria-label="DTG print technology"
+          >
+            DTG
+          </ToggleButton>
+          <ToggleButton 
+            value="DTF" 
+            aria-label="DTF print technology"
+          >
+            DTF
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+      
+      {/* Print Areas Grid */}
+      <Grid container spacing={3} justifyContent="center">
+        {TAB_AREAS[activeTab].map((area) => (
+          <Grid item xs={6} md="auto" key={area.key}>
+            <ButtonBase
+              onClick={() => handleAreaSelect(area.key)}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                p: 1,
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: selectedArea === area.key ? 'primary.main' : 'divider',
+                borderWidth: selectedArea === area.key ? 2 : 1,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  borderColor: 'text.primary',
+                  boxShadow: 2,
+                  '& .tshirt-icon': {
+                    color: 'text.primary'
+                  }
+                },
+                '&:focus-visible': {
+                  outline: '2px solid',
+                  outlineColor: 'primary.main',
+                  outlineOffset: 2
+                }
+              }}
+              role="button"
+              aria-label={`${area.label} print area`}
+              aria-pressed={selectedArea === area.key}
+            >
+              <Box sx={{ mb: 1 }}>
+                <TShirtIcon 
+                  area={area.key} 
+                  selected={selectedArea === area.key}
+                />
+              </Box>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: selectedArea === area.key ? 'text.primary' : 'text.secondary',
+                  fontWeight: selectedArea === area.key ? 600 : 500
+                }}
+              >
+                {area.label}
+              </Typography>
+            </ButtonBase>
+          </Grid>
+        ))}
+      </Grid>
+    </Paper>
+  );
+};
+
+// Size Guide Accordion Component
+const SizeGuideAccordion: React.FC = () => {
+  const sizeChartData = [
+    { size: 'XS', chest: '30-32', length: '24' },
+    { size: 'S', chest: '32-34', length: '25' },
+    { size: 'M', chest: '34-36', length: '26' },
+    { size: 'L', chest: '36-38', length: '27' },
+    { size: 'XL', chest: '38-40', length: '28' },
+    { size: '2XL', chest: '40-42', length: '29' },
+    { size: '3XL', chest: '42-44', length: '30' }
+  ];
+
+  return (
+    <Accordion
+      square={false}
+      disableGutters
+      elevation={0}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        mt: 2,
+        '&:before': { display: 'none' }
+      }}
+    >
+      <AccordionSummary
+        expandIcon={
+          <Box
+            sx={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: 'action.hover',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <ExpandMore sx={{ fontSize: 20, color: 'text.secondary' }} />
+          </Box>
+        }
+        sx={{
+          '& .MuiAccordionSummary-content': {
+            margin: 0
+          }
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          Size guide
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ pt: 0, pb: 2 }}>
+        <Box sx={{ overflowX: 'auto' }}>
+          <TableContainer>
+            <Table size="small">
+              <TableBody>
+                <TableRow>
+                  <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                    Size
+                  </TableCell>
+                  <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                    Chest (in)
+                  </TableCell>
+                  <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                    Length (in)
+                  </TableCell>
+                </TableRow>
+                {sizeChartData.map((row) => (
+                  <TableRow key={row.size}>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      {row.size}
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      {row.chest}
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      {row.length}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+// Product Details Accordion Component
+const ProductDetailsAccordion: React.FC = () => {
+  return (
+    <Accordion
+      defaultExpanded
+      square={false}
+      disableGutters
+      elevation={0}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        mt: 2,
+        '&:before': { display: 'none' }
+      }}
+    >
+      <AccordionSummary
+        expandIcon={
+          <Box
+            sx={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: 'action.hover',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <ExpandMore sx={{ fontSize: 20, color: 'text.secondary' }} />
+          </Box>
+        }
+        sx={{
+          '& .MuiAccordionSummary-content': {
+            margin: 0
+          }
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          Product Details
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ pt: 0, pb: 2 }}>
+        <Grid container spacing={4} sx={{ maxWidth: 1000 }}>
+          {/* Specifications */}
+          <Grid item xs={12} md={6}>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: 'text.primary' }}>
+              Specifications
+            </Typography>
+            <TableContainer>
+              <Table size="small">
+                <TableBody>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Material
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      100% Premium Cotton
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Weight
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      180 GSM
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Fit
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      Crop Top Fit
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Style
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      Short Sleeve Crop Top
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+
+          {/* Available Options */}
+          <Grid item xs={12} md={6}>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: 'text.primary' }}>
+              Available Options
+            </Typography>
+            <TableContainer>
+              <Table size="small">
+                <TableBody>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Colors
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      4 options
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Sizes
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      7 options
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Technology
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      2 options
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+        </Grid>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+// Fulfillment Options Accordion Component
+const FulfillmentOptionsAccordion: React.FC = () => {
+  return (
+    <Accordion
+      defaultExpanded
+      square={false}
+      disableGutters
+      elevation={0}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        mt: 2,
+        '&:before': { display: 'none' }
+      }}
+    >
+      <AccordionSummary
+        expandIcon={
+          <Box
+            sx={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: 'action.hover',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <ExpandMore sx={{ fontSize: 20, color: 'text.secondary' }} />
+          </Box>
+        }
+        sx={{
+          '& .MuiAccordionSummary-content': {
+            margin: 0
+          }
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          Fulfillment Options
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ pt: 0, pb: 2 }}>
+        <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3, maxWidth: 600 }}>
+          Choose from our network of trusted fulfillment providers. Each provider offers different pricing, production times, and shipping options to meet your specific needs.
+        </Typography>
+        <FulfillmentProvidersSection />
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+// Customer Reviews Accordion Component
+const CustomerReviewsAccordion: React.FC = () => {
+  return (
+    <Accordion
+      defaultExpanded
+      square={false}
+      disableGutters
+      elevation={0}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        mt: 2,
+        '&:before': { display: 'none' }
+      }}
+    >
+      <AccordionSummary
+        expandIcon={
+          <Box
+            sx={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: 'action.hover',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <ExpandMore sx={{ fontSize: 20, color: 'text.secondary' }} />
+          </Box>
+        }
+        sx={{
+          '& .MuiAccordionSummary-content': {
+            margin: 0
+          }
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          Customer Reviews
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ pt: 0, pb: 2 }}>
+        <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4, maxWidth: 500 }}>
+          No reviews yet for this product. Be the first to share your experience and help other customers make informed decisions.
+        </Typography>
+        <Button
+          variant="contained"
+          size="large"
+          sx={{
+            px: 4,
+            py: 1.5,
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 600
+          }}
+        >
+          Write a Review
+        </Button>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
 const WomensShortSleeveCropTop: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -394,7 +887,6 @@ const WomensShortSleeveCropTop: React.FC = () => {
   const [selectedSize, setSelectedSize] = useState('M');
   const [selectedTechnology, setSelectedTechnology] = useState('DTG');
   const [selectedCountry, setSelectedCountry] = useState('UAE');
-  const [tabValue, setTabValue] = useState(0);
   const [mainImage, setMainImage] = useState('/assets/img/tee.jpg');
   
   const { shipFrom, setShipFrom, setCurrency } = useUIStore();
@@ -424,10 +916,6 @@ const WomensShortSleeveCropTop: React.FC = () => {
       'Easy to customize', 'Multiple color options', 'Fashion-forward design'
     ],
     shipping: { UAE: { price: 15.00, currency: 'AED', days: '3-5' }, Egypt: { price: 25.00, currency: 'EGP', days: '5-8' } }
-  };
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
   };
 
   const getCurrentPrice = () => {
@@ -759,78 +1247,69 @@ const WomensShortSleeveCropTop: React.FC = () => {
             </Grid>
           </Grid>
 
-          {/* Tabs Section */}
-          <Box sx={{ mt: 6 }}>
-            <Card>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={tabValue} onChange={handleTabChange} aria-label="product tabs">
-                  <Tab label="Description" {...a11yProps(0)} />
-                  <Tab label="Product Details" {...a11yProps(1)} />
-                  <Tab label="Reviews" {...a11yProps(2)} />
-                  <Tab label="Fulfillment" {...a11yProps(3)} />
-                </Tabs>
-              </Box>
-              <TabPanel value={tabValue} index={0}>
-                <Typography variant="body1" paragraph>
-                  {product.description}
-                </Typography>
-                <Typography variant="body1" paragraph>
-                  This trendy short sleeve crop top is designed for the modern woman who loves to make a statement. 
-                  Made from premium cotton fabric, it offers both comfort and style. The crop fit adds a contemporary 
-                  touch while maintaining elegance and versatility.
-                </Typography>
-              </TabPanel>
-              <TabPanel value={tabValue} index={1}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} md={6}>
-                    <Typography variant="h6" sx={{ mb: 2 }}>Specifications</Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="body2">Material:</Typography>
-                      <Typography variant="body2">100% Premium Cotton</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="body2">Fit:</Typography>
-                      <Typography variant="body2">Crop</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="body2">Sleeve Length:</Typography>
-                      <Typography variant="body2">Short Sleeve</Typography>
-                    </Box>
-                    <Box sx={{ display: 'space-between', mb: 1 }}>
-                      <Typography variant="body2">Care:</Typography>
-                      <Typography variant="body2">Machine wash cold</Typography>
-                    </Box>
+          {/* Info Sections - Full Width Below Main Grid */}
+          <Box sx={{ mt: 8 }}>
+            {/* Description Section */}
+            <Box sx={{ mb: 6 }}>
+              <Typography variant="h4" sx={{ fontWeight: 600, mb: 3, color: 'text.primary' }}>
+                Product Description
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4, lineHeight: 1.7, maxWidth: 800 }}>
+                {product.description}
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4, lineHeight: 1.7, maxWidth: 800 }}>
+                This trendy short sleeve crop top is designed for the modern woman who loves to make a statement. 
+                Made from premium cotton fabric, it offers both comfort and style. The crop fit adds a contemporary 
+                touch while maintaining elegance and versatility.
+              </Typography>
+              
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, color: 'text.primary' }}>
+                Key Features
+              </Typography>
+              <Grid container spacing={2} sx={{ maxWidth: 800 }}>
+                {product.features.map((feature: string, index: number) => (
+                  <Grid item xs={12} sm={6} key={index}>
+                    <Paper
+                      variant="outlined"
+                      sx={{
+                        p: 2,
+                        borderColor: 'divider',
+                        backgroundColor: 'background.paper'
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                        <Box sx={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          backgroundColor: 'primary.main',
+                          mt: 0.5,
+                          flexShrink: 0
+                        }} />
+                        <Typography variant="body2" sx={{ color: 'text.primary', lineHeight: 1.5 }}>
+                          {feature}
+                        </Typography>
+                      </Box>
+                    </Paper>
                   </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Typography variant="h6" sx={{ mb: 2 }}>Available Options</Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="body2">Colors:</Typography>
-                      <Typography variant="body2">{product.colors.join(', ')}</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="body2">Sizes:</Typography>
-                      <Typography variant="body2">{product.sizes.join(', ')}</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="body2">Technology:</Typography>
-                      <Typography variant="body2">{product.technology.join(', ')}</Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </TabPanel>
-              <TabPanel value={tabValue} index={2}>
-                <Box sx={{ textAlign: 'center', py: 4 }}>
-                  <Star sx={{ fontSize: 60, color: '#ffd700', mb: 2 }} />
-                  <Typography variant="h6" sx={{ mb: 1 }}>No Reviews Yet</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Be the first to review this product!
-                  </Typography>
-                </Box>
-              </TabPanel>
-              <TabPanel value={tabValue} index={3}>
-                <FulfillmentProvidersSection />
-              </TabPanel>
-            </Card>
+                ))}
+              </Grid>
+            </Box>
+
+            {/* Product Details Section */}
+            <ProductDetailsAccordion />
+
+            {/* Size Guide Accordion */}
+            <SizeGuideAccordion />
+
+            {/* Print Areas Section */}
+            <PrintAreasSection />
+
+            {/* Fulfillment Section */}
+            <FulfillmentOptionsAccordion />
+
+            {/* Reviews Section */}
+            <CustomerReviewsAccordion />
           </Box>
         </Container>
       </Box>
