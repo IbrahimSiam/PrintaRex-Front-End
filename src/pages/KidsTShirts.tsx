@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import {
   Menu, Search, NotificationsNone, Settings, Home, ChevronLeft,
-  ChevronRight, PushPin, PushPinOutlined, FilterList, ArrowBack
+  ChevronRight, PushPin, PushPinOutlined, ArrowBack
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../stores/uiStore';
