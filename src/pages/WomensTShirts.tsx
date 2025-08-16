@@ -29,89 +29,121 @@ const WomensTShirts: React.FC = () => {
   const tshirtProducts = [
     {
       id: 1,
-      name: 'Premium Women\'s T-Shirt',
+      name: 'Short Sleeve Crop Top',
       image: '/assets/img/tee.jpg',
-      priceUSD: 54.25,
-      priceAED: 199.09,
-      priceEGP: 1708.88,
-      description: 'Comfortable women\'s T-shirt for custom designs with premium cotton fabric.',
-      colors: ['White', 'Black', 'Red', 'Pink'],
+      priceUSD: 24.99,
+      priceAED: 91.75,
+      priceEGP: 787.69,
+      description: 'Trendy short sleeve crop top with a modern fit and premium cotton fabric.',
+      colors: ['White', 'Black', 'Pink', 'Lavender'],
       sizes: ['XS', 'S', 'M', 'L', 'XL'],
-      technology: ['DTG', 'Embroidery', 'Screen Printing'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['premium', 'comfortable', 'fashion']
+      tags: ['crop-top', 'trendy', 'modern']
     },
     {
       id: 2,
-      name: 'Women\'s Fashion T-Shirt',
+      name: 'Long Sleeve Crop Top',
       image: '/assets/img/tee.jpg',
-      priceUSD: 67.85,
-      priceAED: 248.99,
-      priceEGP: 2137.28,
-      description: 'Stylish women\'s T-shirt with modern fit and trendy design options.',
-      colors: ['White', 'Black', 'Yellow', 'Blue'],
-      sizes: ['XS', 'S', 'M', 'L'],
-      technology: ['DTG', 'Embroidery', 'Heat Transfer'],
+      priceUSD: 27.99,
+      priceAED: 102.75,
+      priceEGP: 882.19,
+      description: 'Elegant long sleeve crop top with a sophisticated design and comfortable fit.',
+      colors: ['White', 'Black', 'Navy', 'Burgundy'],
+      sizes: ['XS', 'S', 'M', 'L', 'XL'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['fashion', 'stylish', 'modern']
+      tags: ['long-sleeve', 'elegant', 'sophisticated']
     },
     {
       id: 3,
-      name: 'Women\'s Athletic T-Shirt',
+      name: 'Short Sleeve',
       image: '/assets/img/tee.jpg',
-      priceUSD: 49.99,
-      priceAED: 183.45,
-      priceEGP: 1574.69,
-      description: 'Performance T-shirt designed for active women with moisture-wicking technology.',
-      colors: ['Black', 'Gray', 'Blue', 'Purple'],
+      priceUSD: 26.99,
+      priceAED: 99.05,
+      priceEGP: 850.69,
+      description: 'Classic short sleeve T-shirt with a flattering fit and premium cotton fabric.',
+      colors: ['White', 'Black', 'Gray', 'Blue'],
       sizes: ['XS', 'S', 'M', 'L', 'XL'],
-      technology: ['DTG', 'DTF', 'Heat Transfer'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['athletic', 'performance', 'active']
+      tags: ['short-sleeve', 'classic', 'versatile']
     },
     {
       id: 4,
-      name: 'Women\'s Organic Cotton T-Shirt',
+      name: 'Oversize',
       image: '/assets/img/tee.jpg',
-      priceUSD: 79.99,
-      priceAED: 293.45,
-      priceEGP: 2519.69,
-      description: 'Eco-friendly T-shirt made from 100% organic cotton for conscious consumers.',
-      colors: ['Natural', 'White', 'Black', 'Green'],
-      sizes: ['XS', 'S', 'M', 'L'],
+      priceUSD: 29.99,
+      priceAED: 110.05,
+      priceEGP: 945.19,
+      description: 'Trendy oversize T-shirt with a relaxed fit and modern streetwear aesthetic.',
+      colors: ['White', 'Black', 'Oversized', 'Fashion'],
+      sizes: ['XS', 'S', 'M', 'L', 'XL'],
       technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['organic', 'eco-friendly', 'sustainable']
+      tags: ['oversize', 'trendy', 'streetwear']
     },
     {
       id: 5,
-      name: 'Women\'s Vintage Style T-Shirt',
+      name: 'Polo',
       image: '/assets/img/tee.jpg',
-      priceUSD: 59.99,
-      priceAED: 220.05,
-      priceEGP: 1889.69,
-      description: 'Vintage-inspired T-shirt with a retro fit and distressed look for streetwear styles.',
-      colors: ['Cream', 'Black', 'Olive', 'Burgundy'],
-      sizes: ['XS', 'S', 'M', 'L'],
-      technology: ['DTG', 'DTF', 'Screen Printing'],
+      priceUSD: 34.99,
+      priceAED: 128.45,
+      priceEGP: 1102.69,
+      description: 'Classic polo shirt with a sophisticated collar and professional appearance.',
+      colors: ['White', 'Black', 'Navy', 'Burgundy'],
+      sizes: ['XS', 'S', 'M', 'L', 'XL'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['vintage', 'retro', 'streetwear']
+      tags: ['polo', 'professional', 'sophisticated']
     },
     {
       id: 6,
-      name: 'Women\'s Luxury Pima Cotton T-Shirt',
+      name: 'Softstyle Comfort',
       image: '/assets/img/tee.jpg',
-      priceUSD: 89.99,
-      priceAED: 330.26,
-      priceEGP: 2834.69,
-      description: 'Ultra-soft Pima cotton T-shirt with a luxurious feel and premium quality.',
-      colors: ['White', 'Black', 'Ivory', 'Navy'],
-      sizes: ['XS', 'S', 'M', 'L'],
-      technology: ['DTG', 'DTF', 'Embroidery'],
+      priceUSD: 27.99,
+      priceAED: 102.75,
+      priceEGP: 882.19,
+      description: 'Ultra-soft comfort T-shirt with a relaxed fit and premium fabric blend.',
+      colors: ['White', 'Black', 'Gray', 'Blue'],
+      sizes: ['XS', 'S', 'M', 'L', 'XL'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['luxury', 'pima-cotton', 'premium']
+      tags: ['softstyle', 'comfort', 'premium']
+    },
+    {
+      id: 7,
+      name: 'Slim Fit',
+      image: '/assets/img/tee.jpg',
+      priceUSD: 26.99,
+      priceAED: 99.05,
+      priceEGP: 850.69,
+      description: 'Modern slim fit T-shirt with a tailored silhouette and stretch fabric.',
+      colors: ['White', 'Black', 'Gray', 'Navy'],
+      sizes: ['XS', 'S', 'M', 'L', 'XL'],
+      technology: ['DTG', 'DTF'],
+      inStock: true,
+      tags: ['slim-fit', 'modern', 'tailored']
     }
   ];
+
+  const handleProductClick = (productName: string) => {
+    // Convert product name to route path
+    const routeMap: { [key: string]: string } = {
+      'Short Sleeve Crop Top': '/app/womens-short-sleeve-crop-top',
+      'Long Sleeve Crop Top': '/app/womens-long-sleeve-crop-top',
+      'Short Sleeve': '/app/womens-short-sleeve',
+      'Oversize': '/app/womens-oversize',
+      'Polo': '/app/womens-polo',
+      'Softstyle Comfort': '/app/womens-softstyle-comfort',
+      'Slim Fit': '/app/womens-slim-fit'
+    };
+    
+    const route = routeMap[productName];
+    if (route) {
+      navigate(route);
+    }
+  };
 
   const handleSidebarToggle = () => setSidebarOpen(!sidebarOpen);
   const handleSidebarPin = () => setSidebarPinned(!sidebarPinned);
@@ -331,7 +363,7 @@ const WomensTShirts: React.FC = () => {
             {tshirtProducts.map((product) => (
               <Grid item xs={12} sm={6} md={4} key={product.id}>
                 <Card
-                  onClick={() => navigate(`/app/designer?productId=${product.id}`)}
+                  onClick={() => handleProductClick(product.name)}
                   sx={{
                     height: '100%',
                     borderRadius: 3,

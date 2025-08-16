@@ -11,11 +11,30 @@ import Catalog from '../pages/Catalog';
 import Designer from '../pages/Designer';
 import Checkout from '../pages/Checkout';
 import TShirts from '../pages/TShirts';
+import ShortSleeveTShirt from '../pages/ShortSleeveTShirt';
+import OversizeTShirt from '../pages/OversizeTShirt';
+import PoloShirt from '../pages/PoloShirt';
+import SoftstyleComfortTShirt from '../pages/SoftstyleComfortTShirt';
+import SlimFitTShirt from '../pages/SlimFitTShirt';
 import Hoodies from '../pages/Hoodies';
 import WomensTShirts from '../pages/WomensTShirts';
+import WomensShortSleeveCropTop from '../pages/WomensShortSleeveCropTop';
+import WomensLongSleeveCropTop from '../pages/WomensLongSleeveCropTop';
+import WomensShortSleeve from '../pages/WomensShortSleeve';
+import WomensOversize from '../pages/WomensOversize';
+import WomensPolo from '../pages/WomensPolo';
+import WomensSoftstyleComfort from '../pages/WomensSoftstyleComfort';
+import WomensSlimFit from '../pages/WomensSlimFit';
 import WomensHoodies from '../pages/WomensHoodies';
-import KidsTShirts from '../pages/KidsTShirts';
-import KidsHoodies from '../pages/KidsHoodies';
+import WomensClassicTShirt from '../pages/WomensClassicTShirt';
+import WomensFashionTShirt from '../pages/WomensFashionTShirt';
+import WomensComfortTShirt from '../pages/WomensComfortTShirt';
+import WomensPremiumTShirt from '../pages/WomensPremiumTShirt';
+import WomensSportTShirt from '../pages/WomensSportTShirt';
+import WomensClassicHoodie from '../pages/WomensClassicHoodie';
+import WomensFashionHoodie from '../pages/WomensFashionHoodie';
+import WomensComfortHoodie from '../pages/WomensComfortHoodie';
+
 import PlaceholderPage from '../components/PlaceholderPage';
 
 // Create RTL cache
@@ -64,11 +83,29 @@ const App: React.FC = () => {
           <Route path="/app/catalog" element={<Catalog />} />
           <Route path="/app/designer" element={<Designer />} />
           <Route path="/app/t-shirts" element={<TShirts />} />
+          <Route path="/app/short-sleeve-t-shirt" element={<ShortSleeveTShirt />} />
+          <Route path="/app/oversize-t-shirt" element={<OversizeTShirt />} />
+          <Route path="/app/polo-shirt" element={<PoloShirt />} />
+          <Route path="/app/softstyle-comfort-t-shirt" element={<SoftstyleComfortTShirt />} />
+          <Route path="/app/slim-fit-t-shirt" element={<SlimFitTShirt />} />
           <Route path="/app/hoodies" element={<Hoodies />} />
           <Route path="/app/womens-t-shirts" element={<WomensTShirts />} />
           <Route path="/app/womens-hoodies" element={<WomensHoodies />} />
-          <Route path="/app/kids-t-shirts" element={<KidsTShirts />} />
-          <Route path="/app/kids-hoodies" element={<KidsHoodies />} />
+          <Route path="/app/womens-classic-t-shirt" element={<WomensClassicTShirt />} />
+          <Route path="/app/womens-fashion-t-shirt" element={<WomensFashionTShirt />} />
+          <Route path="/app/womens-comfort-t-shirt" element={<WomensComfortTShirt />} />
+          <Route path="/app/womens-premium-t-shirt" element={<WomensPremiumTShirt />} />
+          <Route path="/app/womens-sport-t-shirt" element={<WomensSportTShirt />} />
+          <Route path="/app/womens-classic-hoodie" element={<WomensClassicHoodie />} />
+          <Route path="/app/womens-fashion-hoodie" element={<WomensFashionHoodie />} />
+          <Route path="/app/womens-comfort-hoodie" element={<WomensComfortHoodie />} />
+          <Route path="/app/womens-short-sleeve-crop-top" element={<WomensShortSleeveCropTop />} />
+          <Route path="/app/womens-long-sleeve-crop-top" element={<WomensLongSleeveCropTop />} />
+          <Route path="/app/womens-short-sleeve" element={<WomensShortSleeve />} />
+          <Route path="/app/womens-oversize" element={<WomensOversize />} />
+          <Route path="/app/womens-polo" element={<WomensPolo />} />
+          <Route path="/app/womens-softstyle-comfort" element={<WomensSoftstyleComfort />} />
+          <Route path="/app/womens-slim-fit" element={<WomensSlimFit />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/pricing" element={<PlaceholderPage title="Pricing" message="Pricing information will be available soon!" />} />
           <Route path="/support" element={<PlaceholderPage title="Support" message="Support center is coming soon!" />} />

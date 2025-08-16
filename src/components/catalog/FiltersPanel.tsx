@@ -41,7 +41,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ isOpen, onClose }) => {
 
   const sizes: ProductSize[] = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
   const colors: ProductColor[] = ['White', 'Black', 'Green', 'Red', 'Blue', 'Yellow'];
-  const technologies = ['DTG', 'DTF', 'Embroidery'];
+  const technologies = ['DTG', 'DTF'];
   const genders = ['men', 'women', 'unisex'];
 
   const handlePriceChange = (_event: Event, newValue: number | number[]) => {

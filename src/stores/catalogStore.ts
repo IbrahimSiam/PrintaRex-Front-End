@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type ProductCategory = 'mens' | 'womens' | 'kids';
+export type ProductCategory = 'mens' | 'womens';
 export type ProductSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | '2XL' | '3XL';
 export type ProductColor = 'White' | 'Black' | 'Green' | 'Red' | 'Blue' | 'Yellow' | 'Pink';
 
@@ -153,43 +153,7 @@ const sampleProducts: Product[] = [
     tags: ['hoodies', 'customizable'],
   },
   
-  // Kids' Clothing
-  {
-    id: 5,
-    name: 'T-Shirts',
-    category: 'kids',
-    subcategory: 'T-Shirts',
-    gender: 'unisex',
-    image: '/assets/img/tee.jpg',
-    priceUSD: 0,
-    priceAED: 0,
-    priceEGP: 0,
-    description: 'Browse our collection of customizable kids\' T-shirts',
-    technology: [],
-    brand: 'PrintaRex',
-    colors: [],
-    sizes: [],
-    inStock: true,
-    tags: ['t-shirts', 'customizable'],
-  },
-  {
-    id: 6,
-    name: 'Hoodies',
-    category: 'kids',
-    subcategory: 'Hoodies',
-    gender: 'unisex',
-    image: '/assets/img/hoodie.jpg',
-    priceUSD: 0,
-    priceAED: 0,
-    priceEGP: 0,
-    description: 'Browse our collection of customizable kids\' hoodies',
-    technology: [],
-    brand: 'PrintaRex',
-    colors: [],
-    sizes: [],
-    inStock: true,
-    tags: ['hoodies', 'customizable'],
-  },
+
 ];
 
 const initialFilters: CatalogFilters = {

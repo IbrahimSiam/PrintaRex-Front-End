@@ -25,91 +25,77 @@ const TShirts: React.FC = () => {
   // Get UI store for currency and shipFrom
   const { shipFrom, setShipFrom, setCurrency } = useUIStore();
 
-  // Sample T-shirt products data
+  // Sample Men's T-shirt products data
   const tshirtProducts = [
     {
       id: 1,
-      name: 'Classic Cotton T-Shirt',
+      name: 'Short Sleeve T-Shirt',
       image: '/assets/img/tee.jpg',
       priceUSD: 24.99,
-      priceAED: 91.71,
-      priceEGP: 787.19,
-      description: 'Premium 100% cotton T-shirt with a comfortable fit. Perfect for everyday wear and custom designs.',
+      priceAED: 91.75,
+      priceEGP: 787.69,
+      description: 'Classic short sleeve T-shirt with a comfortable fit and premium cotton fabric.',
       colors: ['White', 'Black', 'Navy', 'Gray'],
-      sizes: ['S', 'M', 'L', 'XL', '2XL'],
-      technology: ['DTG', 'DTF', 'Screen Printing'],
+      sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['classic', 'cotton', 'comfortable']
+      tags: ['classic', 'comfortable', 'versatile']
     },
     {
       id: 2,
-      name: 'Premium Performance T-Shirt',
-      image: '/assets/img/tee.jpg',
-      priceUSD: 34.99,
-      priceAED: 128.41,
-      priceEGP: 1102.19,
-      description: 'High-performance moisture-wicking T-shirt made from premium materials. Ideal for sports and active lifestyle.',
-      colors: ['White', 'Black', 'Blue', 'Red'],
-      sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-      technology: ['DTG', 'DTF', 'Embroidery'],
-      inStock: true,
-      tags: ['performance', 'moisture-wicking', 'sports']
-    },
-    {
-      id: 3,
-      name: 'Vintage Style T-Shirt',
+      name: 'Oversize T-Shirt',
       image: '/assets/img/tee.jpg',
       priceUSD: 29.99,
       priceAED: 110.05,
-      priceEGP: 944.69,
-      description: 'Vintage-inspired T-shirt with a retro fit and soft, pre-washed fabric. Great for casual and streetwear styles.',
-      colors: ['Cream', 'Black', 'Olive', 'Burgundy'],
-      sizes: ['S', 'M', 'L', 'XL'],
-      technology: ['DTG', 'DTF', 'Screen Printing'],
+      priceEGP: 945.19,
+      description: 'Trendy oversize T-shirt with a relaxed fit and modern streetwear aesthetic.',
+      colors: ['White', 'Black', 'Oversized', 'Fashion'],
+      sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['vintage', 'retro', 'streetwear']
+      tags: ['oversize', 'trendy', 'streetwear']
+    },
+    {
+      id: 3,
+      name: 'Polo Shirt',
+      image: '/assets/img/tee.jpg',
+      priceUSD: 34.99,
+      priceAED: 128.45,
+      priceEGP: 1102.69,
+      description: 'Classic polo shirt with a sophisticated collar and professional appearance.',
+      colors: ['White', 'Black', 'Navy', 'Burgundy'],
+      sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
+      technology: ['DTG', 'DTF'],
+      inStock: true,
+      tags: ['polo', 'professional', 'sophisticated']
     },
     {
       id: 4,
-      name: 'Organic Cotton T-Shirt',
+      name: 'Softstyle Comfort T-Shirt',
       image: '/assets/img/tee.jpg',
-      priceUSD: 39.99,
-      priceAED: 146.76,
-      priceEGP: 1259.69,
-      description: 'Eco-friendly T-shirt made from 100% organic cotton. Sustainable and comfortable for conscious consumers.',
-      colors: ['Natural', 'White', 'Black', 'Green'],
-      sizes: ['S', 'M', 'L', 'XL'],
+      priceUSD: 27.99,
+      priceAED: 102.75,
+      priceEGP: 882.19,
+      description: 'Ultra-soft comfort T-shirt with a relaxed fit and premium fabric blend.',
+      colors: ['White', 'Black', 'Gray', 'Blue'],
+      sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
       technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['organic', 'eco-friendly', 'sustainable']
+      tags: ['softstyle', 'comfort', 'premium']
     },
     {
       id: 5,
-      name: 'Athletic Fit T-Shirt',
+      name: 'Slim Fit T-Shirt',
       image: '/assets/img/tee.jpg',
-      priceUSD: 27.99,
-      priceAED: 102.71,
-      priceEGP: 881.69,
-      description: 'Athletic fit T-shirt designed for active individuals. Stretchy fabric with excellent breathability.',
-      colors: ['White', 'Black', 'Gray', 'Blue'],
-      sizes: ['S', 'M', 'L', 'XL', '2XL'],
-      technology: ['DTG', 'DTF', 'Heat Transfer'],
+      priceUSD: 26.99,
+      priceAED: 99.05,
+      priceEGP: 850.69,
+      description: 'Modern slim fit T-shirt with a tailored silhouette and stretch fabric.',
+      colors: ['White', 'Black', 'Gray', 'Navy'],
+      sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['athletic', 'stretchy', 'breathable']
-    },
-    {
-      id: 6,
-      name: 'Luxury Pima Cotton T-Shirt',
-      image: '/assets/img/tee.jpg',
-      priceUSD: 49.99,
-      priceAED: 183.45,
-      priceEGP: 1574.69,
-      description: 'Ultra-soft Pima cotton T-shirt with a luxurious feel. Premium quality for discerning customers.',
-      colors: ['White', 'Black', 'Ivory', 'Navy'],
-      sizes: ['S', 'M', 'L', 'XL'],
-      technology: ['DTG', 'DTF', 'Embroidery'],
-      inStock: true,
-      tags: ['luxury', 'pima-cotton', 'premium']
+      tags: ['slim-fit', 'modern', 'tailored']
     }
   ];
 
@@ -168,6 +154,22 @@ const TShirts: React.FC = () => {
       </List>
     </Box>
   );
+
+  const handleProductClick = (productName: string) => {
+    // Convert product name to route path
+    const routeMap: { [key: string]: string } = {
+      'Short Sleeve T-Shirt': '/app/short-sleeve-t-shirt',
+      'Oversize T-Shirt': '/app/oversize-t-shirt',
+      'Polo Shirt': '/app/polo-shirt',
+      'Softstyle Comfort T-Shirt': '/app/softstyle-comfort-t-shirt',
+      'Slim Fit T-Shirt': '/app/slim-fit-t-shirt'
+    };
+    
+    const route = routeMap[productName];
+    if (route) {
+      navigate(route);
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#fafafa' }}>
@@ -331,7 +333,7 @@ const TShirts: React.FC = () => {
             {tshirtProducts.map((product) => (
               <Grid item xs={12} sm={6} md={4} key={product.id}>
                 <Card
-                  onClick={() => navigate(`/app/designer?productId=${product.id}`)}
+                  onClick={() => handleProductClick(product.name)}
                   sx={{
                     height: '100%',
                     borderRadius: 3,

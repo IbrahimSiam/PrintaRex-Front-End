@@ -96,15 +96,13 @@ const Catalog: React.FC = () => {
     const category = searchParams.get('category');
     if (category === 'womens') {
       setSelectedTab('womens');
-    } else if (category === 'kids') {
-      setSelectedTab('kids');
     } else {
       setSelectedTab('mens');
     }
   }, [searchParams, setSelectedTab]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    const newTab = newValue === 0 ? 'mens' : newValue === 1 ? 'womens' : 'kids';
+    const newTab = newValue === 0 ? 'mens' : 'womens';
     setSelectedTab(newTab);
   };
 
@@ -124,11 +122,11 @@ const Catalog: React.FC = () => {
     { label: 'Notifications', icon: <Notifications />, path: '/notifications' },
     { label: 'My Products', icon: <Inventory />, path: '/products' },
     { label: 'Orders', icon: <ShoppingCart />, path: '/orders' },
+    { label: 'Stores', icon: <Storefront />, path: '/stores' },
     { label: 'Insights', icon: <Insights />, path: '/insights' },
     { label: 'Templates', icon: <ViewModule />, path: '/templates' },
     { label: 'Branded Packing', icon: <LocalShipping />, path: '/branded-packing' },
     { label: 'Personalization Studio', icon: <Brush />, path: '/studio' },
-    { label: 'Stores', icon: <Storefront />, path: '/stores' },
     { label: 'Customer Support', icon: <Support />, path: '/support' },
   ];
 
@@ -244,16 +242,12 @@ const Catalog: React.FC = () => {
                      navigate('/app/t-shirts');
                    } else if (product.category === 'womens') {
                      navigate('/app/womens-t-shirts');
-                   } else if (product.category === 'kids') {
-                     navigate('/app/kids-t-shirts');
                    }
                  } else if (product.name === 'Hoodies') {
                    if (product.category === 'mens') {
                      navigate('/app/hoodies');
                    } else if (product.category === 'womens') {
                      navigate('/app/womens-hoodies');
-                   } else if (product.category === 'kids') {
-                     navigate('/app/kids-hoodies');
                    }
                  }
                }}
@@ -344,16 +338,12 @@ const Catalog: React.FC = () => {
                            navigate('/app/t-shirts');
                          } else if (product.category === 'womens') {
                            navigate('/app/womens-t-shirts');
-                         } else if (product.category === 'kids') {
-                           navigate('/app/kids-t-shirts');
                          }
                        } else if (product.name === 'Hoodies') {
                          if (product.category === 'mens') {
                            navigate('/app/hoodies');
                          } else if (product.category === 'womens') {
                            navigate('/app/womens-hoodies');
-                         } else if (product.category === 'kids') {
-                           navigate('/app/kids-hoodies');
                          }
                        }
                      }}
@@ -542,7 +532,7 @@ const Catalog: React.FC = () => {
           {/* Category Tabs */}
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
             <Tabs
-              value={selectedTab === 'mens' ? 0 : selectedTab === 'womens' ? 1 : 2}
+              value={selectedTab === 'mens' ? 0 : 1}
               onChange={handleTabChange}
               aria-label="Product categories"
               sx={{
@@ -561,7 +551,6 @@ const Catalog: React.FC = () => {
             >
               <Tab label="Men's Clothing" {...a11yProps(0)} />
               <Tab label="Women's Clothing" {...a11yProps(1)} />
-              <Tab label="Kids' Clothing" {...a11yProps(2)} />
             </Tabs>
           </Box>
 
@@ -591,7 +580,7 @@ const Catalog: React.FC = () => {
           )}
 
           {/* Products Grid */}
-          <TabPanel value={selectedTab === 'mens' ? 0 : selectedTab === 'womens' ? 1 : 2} index={selectedTab === 'mens' ? 0 : selectedTab === 'womens' ? 1 : 2}>
+          <TabPanel value={selectedTab === 'mens' ? 0 : 1} index={selectedTab === 'mens' ? 0 : selectedTab === 'womens' ? 1 : 0}>
             {renderProducts()}
           </TabPanel>
         </Container>

@@ -37,7 +37,7 @@ const Hoodies: React.FC = () => {
       description: 'Premium 100% cotton hoodie with a comfortable fit and warm fleece lining. Perfect for casual wear and custom designs.',
       colors: ['Black', 'Gray', 'Navy', 'White'],
       sizes: ['S', 'M', 'L', 'XL', '2XL'],
-      technology: ['DTG', 'DTF', 'Screen Printing', 'Embroidery'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
       tags: ['classic', 'cotton', 'warm', 'comfortable']
     },
@@ -51,7 +51,7 @@ const Hoodies: React.FC = () => {
       description: 'High-quality fleece hoodie with extra warmth and softness. Ideal for cold weather and outdoor activities.',
       colors: ['Black', 'Charcoal', 'Navy', 'Burgundy'],
       sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-      technology: ['DTG', 'DTF', 'Embroidery'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
       tags: ['premium', 'fleece', 'warm', 'outdoor']
     },
@@ -65,7 +65,7 @@ const Hoodies: React.FC = () => {
       description: 'Performance hoodie designed for athletes with moisture-wicking technology and stretchy fabric for maximum mobility.',
       colors: ['Black', 'Gray', 'Blue', 'Red'],
       sizes: ['S', 'M', 'L', 'XL', '2XL'],
-      technology: ['DTG', 'DTF', 'Heat Transfer'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
       tags: ['athletic', 'performance', 'moisture-wicking', 'stretchy']
     },
@@ -79,7 +79,7 @@ const Hoodies: React.FC = () => {
       description: 'Vintage-inspired hoodie with a retro fit and distressed look. Great for streetwear and casual fashion styles.',
       colors: ['Cream', 'Black', 'Olive', 'Burgundy'],
       sizes: ['S', 'M', 'L', 'XL'],
-      technology: ['DTG', 'DTF', 'Screen Printing'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
       tags: ['vintage', 'retro', 'streetwear', 'distressed']
     },
@@ -107,7 +107,7 @@ const Hoodies: React.FC = () => {
       description: 'Ultra-luxurious hoodie made from premium cashmere blend fabric. Exceptional softness and warmth for discerning customers.',
       colors: ['Black', 'Ivory', 'Navy', 'Charcoal'],
       sizes: ['S', 'M', 'L', 'XL'],
-      technology: ['DTG', 'DTF', 'Embroidery'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
       tags: ['luxury', 'cashmere', 'premium', 'ultra-soft']
     }

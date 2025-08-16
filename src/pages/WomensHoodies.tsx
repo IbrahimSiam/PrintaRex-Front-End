@@ -29,89 +29,91 @@ const WomensHoodies: React.FC = () => {
   const hoodieProducts = [
     {
       id: 1,
-      name: 'Premium Women\'s Hoodie',
+      name: 'Women\'s Classic Hoodie',
       image: '/assets/img/hoodie.jpg',
-      priceUSD: 89.99,
-      priceAED: 330.26,
-      priceEGP: 2834.69,
-      description: 'Comfortable women\'s hoodie for custom designs with premium cotton fabric.',
-      colors: ['White', 'Black', 'Red', 'Pink'],
+      priceUSD: 39.99,
+      priceAED: 146.76,
+      priceEGP: 1259.69,
+      description: 'Classic women\'s hoodie with a comfortable fit and warm fleece lining.',
+      colors: ['White', 'Black', 'Gray', 'Pink'],
       sizes: ['XS', 'S', 'M', 'L', 'XL'],
-      technology: ['DTG', 'Embroidery', 'Screen Printing'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['premium', 'comfortable', 'fashion']
+      tags: ['classic', 'comfortable', 'warm']
     },
     {
       id: 2,
       name: 'Women\'s Fashion Hoodie',
       image: '/assets/img/hoodie.jpg',
-      priceUSD: 79.99,
-      priceAED: 293.45,
-      priceEGP: 2519.69,
-      description: 'Stylish women\'s hoodie with modern fit and trendy design options.',
-      colors: ['White', 'Black', 'Yellow', 'Blue'],
-      sizes: ['XS', 'S', 'M', 'L'],
-      technology: ['DTG', 'Embroidery', 'Heat Transfer'],
+      priceUSD: 44.99,
+      priceAED: 165.15,
+      priceEGP: 1417.69,
+      description: 'Trendy fashion hoodie with modern styling and premium materials.',
+      colors: ['White', 'Black', 'Rose', 'Mint'],
+      sizes: ['XS', 'S', 'M', 'L', 'XL'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['fashion', 'stylish', 'modern']
+      tags: ['fashion', 'trendy', 'modern']
     },
     {
       id: 3,
-      name: 'Women\'s Athletic Hoodie',
+      name: 'Women\'s Comfort Hoodie',
       image: '/assets/img/hoodie.jpg',
-      priceUSD: 69.99,
-      priceAED: 256.86,
-      priceEGP: 2204.69,
-      description: 'Performance hoodie designed for active women with moisture-wicking technology.',
-      colors: ['Black', 'Gray', 'Blue', 'Purple'],
+      priceUSD: 37.99,
+      priceAED: 139.45,
+      priceEGP: 1197.69,
+      description: 'Ultra-comfortable hoodie with soft fabric and relaxed fit.',
+      colors: ['White', 'Black', 'Gray', 'Blue'],
       sizes: ['XS', 'S', 'M', 'L', 'XL'],
-      technology: ['DTG', 'DTF', 'Heat Transfer'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['athletic', 'performance', 'active']
+      tags: ['comfort', 'soft', 'relaxed']
     },
     {
       id: 4,
-      name: 'Women\'s Organic Cotton Hoodie',
+      name: 'Women\'s Premium Hoodie',
       image: '/assets/img/hoodie.jpg',
-      priceUSD: 99.99,
-      priceAED: 366.86,
-      priceEGP: 3149.69,
-      description: 'Eco-friendly hoodie made from 100% organic cotton for conscious consumers.',
-      colors: ['Natural', 'White', 'Black', 'Green'],
-      sizes: ['XS', 'S', 'M', 'L'],
+      priceUSD: 49.99,
+      priceAED: 183.45,
+      priceEGP: 1574.69,
+      description: 'Premium quality hoodie with luxurious fabric and elegant design.',
+      colors: ['White', 'Black', 'Ivory', 'Navy'],
+      sizes: ['XS', 'S', 'M', 'L', 'XL'],
       technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['organic', 'eco-friendly', 'sustainable']
+      tags: ['premium', 'luxurious', 'elegant']
     },
     {
       id: 5,
-      name: 'Women\'s Vintage Style Hoodie',
+      name: 'Women\'s Sport Hoodie',
       image: '/assets/img/hoodie.jpg',
-      priceUSD: 74.99,
-      priceAED: 275.05,
-      priceEGP: 2362.19,
-      description: 'Vintage-inspired hoodie with a retro fit and distressed look for streetwear styles.',
-      colors: ['Cream', 'Black', 'Olive', 'Burgundy'],
-      sizes: ['XS', 'S', 'M', 'L'],
-      technology: ['DTG', 'DTF', 'Screen Printing'],
+      priceUSD: 42.99,
+      priceAED: 157.75,
+      priceEGP: 1354.69,
+      description: 'Performance sport hoodie with moisture-wicking technology.',
+      colors: ['White', 'Black', 'Blue', 'Purple'],
+      sizes: ['XS', 'S', 'M', 'L', 'XL'],
+      technology: ['DTG', 'DTF'],
       inStock: true,
-      tags: ['vintage', 'retro', 'streetwear']
-    },
-    {
-      id: 6,
-      name: 'Women\'s Luxury Cashmere Blend Hoodie',
-      image: '/assets/img/hoodie.jpg',
-      priceUSD: 149.99,
-      priceAED: 550.26,
-      priceEGP: 4724.69,
-      description: 'Ultra-luxurious hoodie made from premium cashmere blend fabric for discerning customers.',
-      colors: ['White', 'Black', 'Ivory', 'Navy'],
-      sizes: ['XS', 'S', 'M', 'L'],
-      technology: ['DTG', 'DTF', 'Embroidery'],
-      inStock: true,
-      tags: ['luxury', 'cashmere', 'premium']
+      tags: ['sport', 'performance', 'moisture-wicking']
     }
   ];
+
+  const handleProductClick = (productName: string) => {
+    // Convert product name to route path
+    const routeMap: { [key: string]: string } = {
+      'Women\'s Classic Hoodie': '/app/womens-classic-hoodie',
+      'Women\'s Fashion Hoodie': '/app/womens-fashion-hoodie',
+      'Women\'s Comfort Hoodie': '/app/womens-comfort-hoodie',
+      'Women\'s Premium Hoodie': '/app/womens-premium-hoodie',
+      'Women\'s Sport Hoodie': '/app/womens-sport-hoodie'
+    };
+    
+    const route = routeMap[productName];
+    if (route) {
+      navigate(route);
+    }
+  };
 
   const handleSidebarToggle = () => setSidebarOpen(!sidebarOpen);
   const handleSidebarPin = () => setSidebarPinned(!sidebarPinned);
@@ -331,7 +333,7 @@ const WomensHoodies: React.FC = () => {
             {hoodieProducts.map((product) => (
               <Grid item xs={12} sm={6} md={4} key={product.id}>
                 <Card
-                  onClick={() => navigate(`/app/designer?productId=${product.id}`)}
+                  onClick={() => handleProductClick(product.name)}
                   sx={{
                     height: '100%',
                     borderRadius: 3,
@@ -423,7 +425,7 @@ const WomensHoodies: React.FC = () => {
                       fullWidth
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/app/designer?productId=${product.id}`);
+                        handleProductClick(product.name);
                       }}
                       sx={{ 
                         borderRadius: 2,
