@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import DesignerStepTabs from '../components/designer/DesignerStepTabs';
 import EnhancedDesignerSidebar from '../components/designer/EnhancedDesignerSidebar';
 import DesignerContent from '../components/designer/DesignerContent';
+import RightPanel from '../components/designer/RightPanel';
 
 const Designer: React.FC = () => {
   const navigate = useNavigate();
@@ -79,6 +80,9 @@ const Designer: React.FC = () => {
           <DesignerContent />
         </Box>
       </Box>
+
+      {/* Right Panel for Tool Options */}
+      <RightPanel />
     </Box>
   );
 };

@@ -9,7 +9,7 @@ import {
   Person, GridOn, Search, CropSquare, Settings, Help, ChevronLeft,
   ChevronRight, AutoAwesome, Brush, Palette, ExpandMore, ExpandLess
 } from '@mui/icons-material';
-import { useSidebarStore } from '../../stores/sidebarStore';
+import { useDesignerUIStore } from '../../stores/designerUIStore';
 
 interface SidebarItem {
   id: string;
@@ -21,11 +21,11 @@ interface SidebarItem {
 }
 
 const SIDEBAR_ITEMS: SidebarItem[] = [
-  // Product & Files
+  // PRODUCT & FILES
   { id: 'product', icon: <Checkroom />, label: 'Product', category: 'product' },
   { id: 'files', icon: <CloudUpload />, label: 'Files & Uploads', category: 'product' },
   
-  // Design Tools
+  // DESIGN TOOLS
   { id: 'text', icon: <TextFields />, label: 'Text', category: 'design' },
   { id: 'templates', icon: <ViewModule />, label: 'Templates', category: 'design' },
   { id: 'graphics', icon: <Image />, label: 'Graphics & Images', category: 'design' },
@@ -38,116 +38,49 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   { id: 'brushes', icon: <Brush />, label: 'Brushes', category: 'design' },
   { id: 'palette', icon: <Palette />, label: 'Color Palette', category: 'design' },
   
-  // Settings & Help
+  // SETTINGS & HELP
   { id: 'settings', icon: <Settings />, label: 'Settings', category: 'settings' },
   { id: 'help', icon: <Help />, label: 'Help', category: 'settings' },
+];
+
+const SIDEBAR_GROUPS = [
+  {
+    title: 'PRODUCT & FILES',
+    items: SIDEBAR_ITEMS.filter(item => item.category === 'product')
+  },
+  {
+    title: 'DESIGN TOOLS',
+    items: SIDEBAR_ITEMS.filter(item => item.category === 'design')
+  },
+  {
+    title: 'SETTINGS & HELP',
+    items: SIDEBAR_ITEMS.filter(item => item.category === 'settings')
+  }
 ];
 
 const EnhancedDesignerSidebar: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
   
-  const { 
-    activeTool, 
-    setActiveTool, 
-    railState,
-    setRailState,
-    railWidth,
-    setRailWidth,
-    isHoverExpanded,
-    setIsHoverExpanded,
-    showLabels, 
-    setShowLabels,
-    autoCollapseOnMobile,
-    hasShownCollapseToast,
-    setHasShownCollapseToast,
-    getEffectiveWidth,
-    getEffectiveState
-  } = useSidebarStore();
+  const {
+    sidebar: { isCollapsed, activeToolId },
+    setActiveTool,
+    toggleSidebar
+  } = useDesignerUIStore();
 
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [expandedCategories, setExpandedCategories] = useState({
     product: true,
     design: true,
     settings: true
   });
-  const [hoverTimer, setHoverTimer] = useState<number | null>(null);
-  const [isResizing, setIsResizing] = useState(false);
-  const [startResizeX, setStartResizeX] = useState(0);
-  const [startResizeWidth, setStartResizeWidth] = useState(0);
-
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const effectiveWidth = getEffectiveWidth();
-  const effectiveState = getEffectiveState();
-  const isExpanded = effectiveState === 'expanded';
-  const iconSize = 22;
 
   // Auto-collapse on small screens
   useEffect(() => {
-    if (isSmallScreen && railState === 'expanded' && !hasShownCollapseToast) {
-      setRailState('mini');
-      setHasShownCollapseToast(true);
+    if (isMobile && !isCollapsed) {
+      // Don't auto-collapse, just show a toast or notification
+      console.log('Consider collapsing sidebar on small screens');
     }
-  }, [isSmallScreen, railState, hasShownCollapseToast, setRailState, setHasShownCollapseToast]);
-
-  // Hover behavior for auto mode
-  const handleMouseEnter = useCallback(() => {
-    if (railState === 'auto') {
-      if (hoverTimer) {
-        clearTimeout(hoverTimer);
-        setHoverTimer(null);
-      }
-      
-      const timer = setTimeout(() => {
-        setIsHoverExpanded(true);
-      }, 300); // 300ms delay
-      
-      setHoverTimer(timer);
-    }
-  }, [railState, hoverTimer, setIsHoverExpanded]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (railState === 'auto') {
-      if (hoverTimer) {
-        clearTimeout(hoverTimer);
-        setHoverTimer(null);
-      }
-      
-      const timer = setTimeout(() => {
-        setIsHoverExpanded(false);
-      }, 200); // 200ms delay before closing
-      
-      setHoverTimer(timer);
-    }
-  }, [railState, hoverTimer, setIsHoverExpanded]);
-
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      if (hoverTimer) {
-        clearTimeout(hoverTimer);
-      }
-    };
-  }, [hoverTimer]);
-
-  const handleToolClick = (toolId: string) => {
-    setActiveTool(toolId);
-    // Auto-collapse on mobile after selection
-    if (isMobile && railState === 'auto') {
-      setIsHoverExpanded(false);
-    }
-  };
-
-  const handleExpand = () => {
-    setRailState('expanded');
-    setIsHoverExpanded(false);
-  };
-
-  const handleCollapse = () => {
-    setRailState('mini');
-    setIsHoverExpanded(false);
-  };
+  }, [isMobile, isCollapsed]);
 
   const toggleCategory = (category: keyof typeof expandedCategories) => {
     setExpandedCategories(prev => ({
@@ -156,344 +89,206 @@ const EnhancedDesignerSidebar: React.FC = () => {
     }));
   };
 
-  // Resize functionality
-  const handleResizeStart = (e: React.MouseEvent) => {
-    if (isExpanded) {
-      setIsResizing(true);
-      setStartResizeX(e.clientX);
-      setStartResizeWidth(railWidth);
-      e.preventDefault();
-    }
+  const handleToolClick = (toolId: string) => {
+    setActiveTool(toolId as any);
   };
 
-  const handleResizeMove = useCallback((e: MouseEvent) => {
-    if (isResizing) {
-      const deltaX = e.clientX - startResizeX;
-      const newWidth = Math.max(240, Math.min(360, startResizeWidth + deltaX));
-      setRailWidth(newWidth);
-    }
-  }, [isResizing, startResizeX, startResizeWidth, setRailWidth]);
-
-  const handleResizeEnd = useCallback(() => {
-    setIsResizing(false);
-  }, []);
-
-  useEffect(() => {
-    if (isResizing) {
-      document.addEventListener('mousemove', handleResizeMove);
-      document.addEventListener('mouseup', handleResizeEnd);
-      return () => {
-        document.removeEventListener('mousemove', handleResizeMove);
-        document.removeEventListener('mouseup', handleResizeEnd);
-      };
-    }
-  }, [isResizing, handleResizeMove, handleResizeEnd]);
+  const getEffectiveWidth = () => {
+    return isCollapsed ? 70 : 240;
+  };
 
   const renderSidebarItem = (item: SidebarItem) => {
-    const isActive = activeTool === item.id;
-    const isHovered = hoveredItem === item.id;
-    
+    const isActive = activeToolId === item.id;
+    const isHovered = false; // We'll handle hover effects with CSS
+
     return (
-      <Tooltip
-        title={item.label}
-        placement="right"
-        disableHoverListener={isExpanded}
-        arrow
-      >
-        <ListItem
-          disablePadding
-          sx={{
-            mb: 0.5,
-            mx: 1,
-            borderRadius: 2,
-            overflow: 'hidden'
-          }}
+      <Box key={item.id}>
+        <Tooltip
+          title={item.label}
+          placement="right"
+          disableHoverListener={!isCollapsed}
+          arrow
         >
-          <ListItemButton
-            onClick={() => handleToolClick(item.id)}
-            onMouseEnter={() => setHoveredItem(item.id)}
-            onMouseLeave={() => setHoveredItem(null)}
-            disabled={item.disabled}
+          <ListItem
+            disablePadding
             sx={{
-              minHeight: 48,
-              px: isExpanded ? 2 : 1.5,
-              py: 1.5,
+              mb: 0.5,
+              mx: 1,
               borderRadius: 2,
-              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              backgroundColor: isActive 
-                ? 'primary.main' 
-                : isHovered 
-                  ? 'rgba(0, 0, 0, 0.04)' 
-                  : 'transparent',
-              color: isActive 
-                ? 'primary.contrastText' 
-                : isHovered 
-                  ? 'text.primary' 
-                  : 'text.secondary',
-              '&:hover': {
-                backgroundColor: isActive 
-                  ? 'primary.dark' 
-                  : 'rgba(0, 0, 0, 0.04)',
-                transform: isExpanded ? 'translateX(2px)' : 'none',
-              },
-              '&.Mui-disabled': {
-                opacity: 0.4
-              },
-              position: 'relative',
-              '&::before': isActive ? {
-                content: '""',
-                position: 'absolute',
-                left: 0,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: 3,
-                height: 20,
-                backgroundColor: 'primary.main',
-                borderRadius: '0 2px 2px 0'
-              } : {}
+              overflow: 'hidden'
             }}
           >
-            <ListItemIcon
+            <ListItemButton
+              onClick={() => handleToolClick(item.id)}
               sx={{
-                minWidth: isExpanded ? 32 : 'auto',
-                color: 'inherit',
-                '& .MuiSvgIcon-root': {
-                  fontSize: iconSize,
-                  transition: 'all 0.2s ease',
-                }
+                minHeight: 48,
+                px: isCollapsed ? 1.5 : 2,
+                py: 1,
+                borderRadius: 2,
+                backgroundColor: isActive ? 'primary.main' : 'transparent',
+                color: isActive ? 'primary.contrastText' : 'text.primary',
+                '&:hover': {
+                  backgroundColor: isActive ? 'primary.dark' : 'action.hover',
+                },
+                '&::before': isActive ? {
+                  content: '""',
+                  position: 'absolute',
+                  left: 0,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 3,
+                  height: 20,
+                  backgroundColor: 'primary.main',
+                  borderRadius: '0 2px 2px 0'
+                } : {},
+                transition: 'all 0.2s ease',
+                position: 'relative'
               }}
             >
-              {item.badge ? (
-                <Box sx={{ position: 'relative' }}>
-                  {item.icon}
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: -4,
-                      right: -4,
-                      width: 16,
-                      height: 16,
-                      bgcolor: 'error.main',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.7rem',
-                      color: 'white',
-                      fontWeight: 600
-                    }}
-                  >
-                    {item.badge}
-                  </Box>
-                </Box>
-              ) : (
-                item.icon
-              )}
-            </ListItemIcon>
-            
-            {isExpanded && (
-              <Typography
-                variant="body2"
+              <ListItemIcon
                 sx={{
-                  fontWeight: isActive ? 600 : 500,
-                  fontSize: '14px',
-                  ml: 2,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  fontFamily: 'Inter, Roboto, sans-serif',
-                  transition: 'opacity 0.2s ease',
-                  opacity: 1
+                  minWidth: isCollapsed ? 0 : 40,
+                  color: 'inherit',
+                  '& .MuiSvgIcon-root': {
+                    fontSize: 22,
+                    filter: isActive ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))' : 'none'
+                  }
                 }}
               >
-                {item.label}
-              </Typography>
-            )}
-          </ListItemButton>
-        </ListItem>
-      </Tooltip>
+                {item.icon}
+              </ListItemIcon>
+              
+              {!isCollapsed && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    fontFamily: 'Inter, Roboto, sans-serif',
+                    ml: 1
+                  }}
+                >
+                  {item.label}
+                </Typography>
+              )}
+            </ListItemButton>
+          </ListItem>
+        </Tooltip>
+      </Box>
     );
   };
 
-  const renderCategorySection = (category: keyof typeof expandedCategories, items: SidebarItem[]) => {
-    const categoryLabels = {
-      product: 'PRODUCT & FILES',
-      design: 'DESIGN TOOLS',
-      settings: 'SETTINGS & HELP'
-    };
-    
+  const renderCategorySection = (group: typeof SIDEBAR_GROUPS[0]) => {
+    const isExpanded = expandedCategories[group.title.toLowerCase().replace(/\s+&?\s+/, '') as keyof typeof expandedCategories];
+
     return (
-      <Box key={category}>
-        {isExpanded && (
+      <Box key={group.title} sx={{ mb: 2 }}>
+        {!isCollapsed && (
           <Box
-            onClick={() => toggleCategory(category)}
             sx={{
+              px: 2,
+              py: 1,
               display: 'flex',
               alignItems: 'center',
-              px: 2,
-              py: 1.5,
-              cursor: 'pointer',
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.02)',
-                borderRadius: 1
-              },
-              transition: 'background-color 0.2s ease'
+              justifyContent: 'space-between',
+              cursor: 'pointer'
             }}
+            onClick={() => toggleCategory(group.title.toLowerCase().replace(/\s+&?\s+/, '') as keyof typeof expandedCategories)}
           >
             <Typography
               variant="caption"
               sx={{
                 fontWeight: 600,
-                color: 'text.secondary',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
                 fontSize: '11px',
-                opacity: 0.7,
-                fontFamily: 'Inter, Roboto, sans-serif'
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase',
+                color: 'text.secondary',
+                opacity: 0.8,
+                transition: 'opacity 0.2s ease'
               }}
             >
-              {categoryLabels[category]}
+              {group.title}
             </Typography>
-            {expandedCategories[category] ? 
-              <ExpandLess sx={{ ml: 'auto', fontSize: 16, opacity: 0.5 }} /> : 
-              <ExpandMore sx={{ ml: 'auto', fontSize: 16, opacity: 0.5 }} />
-            }
+            {isExpanded ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
           </Box>
         )}
         
-        <Collapse in={isExpanded ? expandedCategories[category] : true}>
+        <Collapse in={isExpanded}>
           <List disablePadding>
-            {items.map(renderSidebarItem)}
+            {group.items.map(renderSidebarItem)}
           </List>
         </Collapse>
         
-        {category !== 'settings' && isExpanded && (
-          <Divider 
-            sx={{ 
-              my: 1.5, 
-              mx: 2, 
-              opacity: 0.15,
-              borderColor: 'divider'
-            }} 
+        {!isCollapsed && (
+          <Divider
+            sx={{
+              mx: 2,
+              mt: 1,
+              borderColor: 'divider',
+              opacity: 0.6
+            }}
           />
         )}
       </Box>
     );
   };
 
-  const groupedItems = {
-    product: SIDEBAR_ITEMS.filter(item => item.category === 'product'),
-    design: SIDEBAR_ITEMS.filter(item => item.category === 'design'),
-    settings: SIDEBAR_ITEMS.filter(item => item.category === 'settings')
-  };
-
   return (
     <>
-      {/* Hover hot-zone for auto mode */}
-      {railState === 'auto' && (
-        <Box
-          sx={{
-            position: 'fixed',
-            left: 0,
-            top: 0,
-            width: 16,
-            height: '100vh',
-            zIndex: 1199,
-            cursor: 'pointer'
-          }}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        />
-      )}
-
       {/* Main Sidebar */}
       <Drawer
         variant="permanent"
-        ref={sidebarRef}
         sx={{
-          width: effectiveWidth,
+          width: getEffectiveWidth(),
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: effectiveWidth,
+            width: getEffectiveWidth(),
             backgroundColor: '#F9FAFB',
             borderRight: `1px solid ${theme.palette.divider}`,
-            transition: `width ${railState === 'auto' ? '0.2s' : '0.25s'} cubic-bezier(0.4, 0, 0.2, 1)`,
-            overflow: 'hidden',
             boxShadow: '2px 0 8px rgba(0,0,0,0.06)',
-            position: 'relative'
+            transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+            overflow: 'hidden'
           }
         }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
       >
         {/* Sidebar Header */}
         <Box
           sx={{
             p: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            minHeight: 64,
             backgroundColor: 'white',
             borderBottom: `1px solid ${theme.palette.divider}`,
-            boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
           }}
         >
-          {isExpanded && (
+          {!isCollapsed && (
             <Typography
               variant="h6"
               sx={{
-                fontWeight: 700,
-                color: 'primary.main',
-                fontSize: '1.1rem',
-                letterSpacing: '-0.02em',
-                fontFamily: 'Inter, Roboto, sans-serif'
+                fontWeight: 600,
+                fontSize: '16px',
+                fontFamily: 'Inter, Roboto, sans-serif',
+                color: 'text.primary'
               }}
             >
               Designer
             </Typography>
           )}
           
-          <Box sx={{ display: 'flex', gap: 0.5, ml: 'auto' }}>
-            {/* Expand/Collapse Button */}
-            {!isExpanded ? (
-              <Tooltip title="Expand sidebar" placement="right">
-                <IconButton
-                  size="small"
-                  onClick={handleExpand}
-                  sx={{
-                    color: 'text.secondary',
-                    backgroundColor: 'rgba(0,0,0,0.04)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(0,0,0,0.08)',
-                      transform: 'scale(1.05)'
-                    },
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <ChevronRight />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Collapse sidebar" placement="right">
-                <IconButton
-                  size="small"
-                  onClick={handleCollapse}
-                  sx={{
-                    color: 'text.secondary',
-                    backgroundColor: 'rgba(0,0,0,0.04)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(0,0,0,0.08)',
-                      transform: 'scale(1.05)'
-                    },
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <ChevronLeft />
-                </IconButton>
-              </Tooltip>
-            )}
-          </Box>
+          <IconButton
+            size="small"
+            onClick={toggleSidebar}
+            sx={{
+              color: 'text.secondary',
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
+          </IconButton>
         </Box>
 
         {/* Sidebar Content */}
@@ -501,89 +296,12 @@ const EnhancedDesignerSidebar: React.FC = () => {
           sx={{
             flex: 1,
             overflow: 'auto',
-            py: 1
+            py: 2
           }}
         >
-          {renderCategorySection('product', groupedItems.product)}
-          {renderCategorySection('design', groupedItems.design)}
-          {renderCategorySection('settings', groupedItems.settings)}
+          {SIDEBAR_GROUPS.map(renderCategorySection)}
         </Box>
-
-        {/* Resize Handle */}
-        {isExpanded && (
-          <Box
-            sx={{
-              position: 'absolute',
-              right: 0,
-              top: 0,
-              width: 4,
-              height: '100%',
-              cursor: 'col-resize',
-              '&:hover': {
-                backgroundColor: 'primary.main',
-                opacity: 0.4
-              },
-              '&:active': {
-                backgroundColor: 'primary.main',
-                opacity: 0.6
-              },
-              transition: 'all 0.2s ease'
-            }}
-            onMouseDown={handleResizeStart}
-          />
-        )}
       </Drawer>
-
-      {/* Right-Side Contextual Panel */}
-      {activeTool && (
-        <Box
-          sx={{
-            position: 'fixed',
-            right: 0,
-            top: 0,
-            width: 320,
-            height: '100vh',
-            backgroundColor: 'white',
-            borderLeft: `1px solid ${theme.palette.divider}`,
-            boxShadow: '-2px 0 12px rgba(0,0,0,0.08)',
-            zIndex: 1200,
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-        >
-          {/* Panel Header */}
-          <Box
-            sx={{
-              p: 2.5,
-              borderBottom: `1px solid ${theme.palette.divider}`,
-              backgroundColor: 'primary.main',
-              color: 'primary.contrastText',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}
-          >
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              {SIDEBAR_ITEMS.find(item => item.id === activeTool)?.label}
-            </Typography>
-            <IconButton
-              size="small"
-              onClick={() => setActiveTool(null)}
-              sx={{ color: 'inherit' }}
-            >
-              <ChevronLeft />
-            </IconButton>
-          </Box>
-
-          {/* Panel Content */}
-          <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
-            <Typography variant="body2" color="text.secondary">
-              Tool options and settings will appear here for: {activeTool}
-            </Typography>
-          </Box>
-        </Box>
-      )}
     </>
   );
 };
