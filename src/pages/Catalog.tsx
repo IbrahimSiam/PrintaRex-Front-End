@@ -234,31 +234,32 @@ const Catalog: React.FC = () => {
     return (
       <Grid container spacing={3}>
         {filteredProducts.map((product) => (
-                         <Grid item xs={12} sm={6} md={4} key={product.id}>
-                 <Card
-                   onClick={() => {
-                     if (product.name === 'T-Shirts') {
-                       if (product.category === 'mens') {
-                         navigate('/app/t-shirts');
-                       } else if (product.category === 'womens') {
-                         navigate('/app/womens-t-shirts');
-                       }
-                   }}
-               sx={{
-                 height: '100%',
-                 borderRadius: 3,
-                 overflow: 'hidden',
-                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                 cursor: 'pointer',
-                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                 border: '1px solid #f3f4f6',
-                 '&:hover': {
-                   transform: 'translateY(-8px) scale(1.02)',
-                   boxShadow: '0 20px 40px -12px rgba(0, 0, 0, 0.25)',
-                   borderColor: theme.palette.primary.main,
-                 },
-               }}
-             >
+          <Grid item xs={12} sm={6} md={4} key={product.id}>
+            <Card
+              onClick={() => {
+                if (product.name === 'T-Shirts') {
+                  if (product.category === 'mens') {
+                    navigate('/app/t-shirts');
+                  } else if (product.category === 'womens') {
+                    navigate('/app/womens-t-shirts');
+                  }
+                }
+              }}
+              sx={{
+                height: '100%',
+                borderRadius: 3,
+                overflow: 'hidden',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor: 'pointer',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                border: '1px solid #f3f4f6',
+                '&:hover': {
+                  transform: 'translateY(-8px) scale(1.02)',
+                  boxShadow: '0 20px 40px -12px rgba(0, 0, 0, 0.25)',
+                  borderColor: theme.palette.primary.main,
+                },
+              }}
+            >
               <Box sx={{ height: 250, overflow: 'hidden' }}>
                 <img
                   src={product.image || '/assets/img/tee.jpg'}
@@ -320,25 +321,25 @@ const Catalog: React.FC = () => {
                   </Typography>
                 )}
                 
-                                 <Box sx={{ display: 'flex', gap: 1 }}>
-                   <Button 
-                     variant="contained" 
-                     size="small" 
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       if (product.name === 'T-Shirts') {
-                         if (product.category === 'mens') {
-                           navigate('/app/t-shirts');
-                         } else if (product.category === 'womens') {
-                           navigate('/app/womens-t-shirts');
-                         }
-
-                     }}
-                     sx={{ flex: 1 }}
-                   >
-                     Explore {product.name}
-                   </Button>
-                 </Box>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button 
+                    variant="contained" 
+                    size="small" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (product.name === 'T-Shirts') {
+                        if (product.category === 'mens') {
+                          navigate('/app/t-shirts');
+                        } else if (product.category === 'womens') {
+                          navigate('/app/womens-t-shirts');
+                        }
+                      }
+                    }}
+                    sx={{ flex: 1 }}
+                  >
+                    Explore {product.name}
+                  </Button>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
