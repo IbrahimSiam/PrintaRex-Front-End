@@ -42,6 +42,7 @@ interface LoginFormData {
 interface FormErrors {
   email?: string;
   password?: string;
+  rememberMe?: string;
   general?: string;
 }
 

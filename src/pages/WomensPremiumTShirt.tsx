@@ -387,7 +387,7 @@ const WomensPremiumTShirt: React.FC = () => {
                       <Select
                         value={shipFrom}
                         label="Ship From"
-                        onChange={(e) => setShipFrom(e.target.value)}
+                        onChange={(e) => setShipFrom(e.target.value as 'Egypt' | 'UAE')}
                       >
                         <MenuItem value="UAE">UAE</MenuItem>
                         <MenuItem value="Egypt">Egypt</MenuItem>

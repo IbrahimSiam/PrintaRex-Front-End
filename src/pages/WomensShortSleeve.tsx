@@ -5,7 +5,8 @@ import {
   Avatar, TextField, InputAdornment, Badge, Drawer, List, ListItem,
   ListItemIcon, ListItemText, Divider, Fab, Tooltip, ToggleButtonGroup,
   ToggleButton, FormControl, InputLabel, Select, MenuItem, Tabs, Tab,
-  Paper, Rating, Stack, Accordion, AccordionSummary, AccordionDetails
+  Paper, Rating, Stack, Accordion, AccordionSummary, AccordionDetails,
+  ButtonBase
 } from '@mui/material';
 import {
   Menu, Search, NotificationsNone, Settings, Home, ChevronLeft,
@@ -47,6 +48,62 @@ function a11yProps(index: number) {
     'aria-controls': `simple-tabpanel-${index}`,
   };
 }
+
+// T-shirt icon component with shared outline and specific print areas
+const TShirtIcon: React.FC<{
+  area: string;
+  selected: boolean;
+}> = ({ area, selected }) => {
+  const outlineColor = selected ? '#1976d2' : '#424242'; // primary.main : grey.700
+  const dashColor = selected ? '#1976d2' : '#9e9e9e'; // primary.main : grey.500
+  
+  // Print area coordinates for each position
+  const printAreas = {
+    front: { x: 34, y: 30, w: 28, h: 32 },
+    back: { x: 34, y: 30, w: 28, h: 32 },
+    leftSleeve: { x: 22, y: 28, w: 10, h: 10 },
+    rightSleeve: { x: 64, y: 28, w: 10, h: 10 },
+    innerNeck: { x: 41, y: 22, w: 14, h: 8 },
+    outerNeck: { x: 38, y: 18, w: 20, h: 8 }
+  };
+  
+  const printArea = printAreas[area as keyof typeof printAreas];
+  
+  return (
+    <svg viewBox="0 0 96 96" width="96" height="96">
+      {/* shirt outline */}
+      <path
+        d="M32 18l16-8 16 8 10-6 8 12-10 6v44c0 3.3-2.7 6-6 6H30c-3.3 0-6-2.7-6-6V30l-10-6 8-12 10 6z"
+        fill="none" 
+        stroke={outlineColor} 
+        strokeWidth={2} 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+      {/* collar */}
+      <path 
+        d="M40 20c2.8 2.6 6.2 4 8 4s5.2-1.4 8-4" 
+        fill="none"
+        stroke={outlineColor} 
+        strokeWidth={2} 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+      {/* print area */}
+      <rect
+        x={printArea.x}
+        y={printArea.y}
+        width={printArea.w}
+        height={printArea.h}
+        fill="none"
+        stroke={dashColor}
+        strokeWidth={2}
+        strokeDasharray="4 3"
+        rx={2}
+      />
+    </svg>
+  );
+};
 
 const WomensShortSleeve: React.FC = () => {
   const theme = useTheme();

@@ -15,21 +15,28 @@ import {
 
 // Demo data structure
 const demoImages = [
-  { id: 'front', src: '/assets/img/tee.jpg', alt: 'Front view' },
-  { id: 'back', src: '/assets/img/tee.jpg', alt: 'Back view' },
-  { id: 'side1', src: '/assets/img/tee.jpg', alt: 'Side view 1' },
-  { id: 'side2', src: '/assets/img/tee.jpg', alt: 'Side view 2' },
-  { id: 'detail1', src: '/assets/img/tee.jpg', alt: 'Detail view 1' },
-  { id: 'detail2', src: '/assets/img/tee.jpg', alt: 'Detail view 2' },
+  { id: 'front', webp: '/assets/img/tee.jpg', jpg: '/assets/img/tee.jpg', alt: 'Front view' },
+  { id: 'back', webp: '/assets/img/tee.jpg', jpg: '/assets/img/tee.jpg', alt: 'Back view' },
+  { id: 'side1', webp: '/assets/img/tee.jpg', jpg: '/assets/img/tee.jpg', alt: 'Side view 1' },
+  { id: 'side2', webp: '/assets/img/tee.jpg', jpg: '/assets/img/tee.jpg', alt: 'Side view 2' },
+  { id: 'detail1', webp: '/assets/img/tee.jpg', jpg: '/assets/img/tee.jpg', alt: 'Detail view 1' },
+  { id: 'detail2', webp: '/assets/img/tee.jpg', jpg: '/assets/img/tee.jpg', alt: 'Detail view 2' },
 ];
 
-const demoColors = ['White', 'Black', 'Navy', 'Gray', 'Red', 'Blue'];
+const demoColors = [
+  { key: 'white', name: 'White', hex: '#FFFFFF' },
+  { key: 'black', name: 'Black', hex: '#000000' },
+  { key: 'navy', name: 'Navy', hex: '#1e3a8a' },
+  { key: 'gray', name: 'Gray', hex: '#6b7280' },
+  { key: 'red', name: 'Red', hex: '#dc2626' },
+  { key: 'blue', name: 'Blue', hex: '#2563eb' }
+];
 const demoSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
 
 // Demo wrapper component
 export const ProductComponentsDemo: React.FC = () => {
   // State management as specified
-  const [selectedColor, setSelectedColor] = useState<string>('Navy');
+  const [selectedColor, setSelectedColor] = useState<string>('navy');
   const [selectedSize, setSelectedSize] = useState<string>('M');
   const [selectedImage, setSelectedImage] = useState<string>('front');
 
@@ -83,12 +90,30 @@ export const ProductComponentsDemo: React.FC = () => {
               <Typography variant="body2" sx={{ fontWeight: 600, mb: 1.5, color: '#374151' }}>
                 Color
               </Typography>
-              <ColorSwatches
-                colors={demoColors}
-                value={selectedColor}
-                onChange={setSelectedColor}
-                disabledColors={['Red']} // Example of disabled color
-              />
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                {demoColors.map((color) => (
+                  <Box
+                    key={color.key}
+                    sx={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      backgroundColor: color.hex,
+                      border: '1px solid #ccc',
+                      cursor: 'pointer',
+                      boxShadow: selectedColor === color.key 
+                        ? '0 0 0 2px #1976d2, 0 0 0 4px white'
+                        : 'none',
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': {
+                        transform: 'scale(1.1)',
+                        boxShadow: '0 0 0 2px #424242',
+                      }
+                    }}
+                    onClick={() => setSelectedColor(color.key)}
+                  />
+                ))}
+              </Box>
             </Box>
 
             {/* Size Selection */}
@@ -110,7 +135,7 @@ export const ProductComponentsDemo: React.FC = () => {
                 Current Selection:
               </Typography>
               <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                Color: {selectedColor}
+                Color: {demoColors.find(c => c.key === selectedColor)?.name}
               </Typography>
               <Typography variant="body1" sx={{ fontWeight: 600 }}>
                 Size: {selectedSize}

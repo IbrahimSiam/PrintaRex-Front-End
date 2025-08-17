@@ -179,7 +179,7 @@ export default function SignUp() {
                 value={formData.email}
                 onChange={handleInputChange('email')}
                 variant="outlined"
-                size="large"
+                size="medium"
                 sx={{ mb: 3 }}
                 InputProps={{
                   sx: { 
@@ -203,7 +203,7 @@ export default function SignUp() {
                 value={formData.password}
                 onChange={handleInputChange('password')}
                 variant="outlined"
-                size="large"
+                size="medium"
                 sx={{ mb: 3 }}
                 InputProps={{
                   endAdornment: (
