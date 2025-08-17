@@ -261,6 +261,17 @@ free -h
 # CPU usage
 top
 ```
+# Create feature branch
+git checkout -b feature/new-feature
+
+# Work on changes, then merge back to development
+git checkout development
+git merge feature/new-feature
+
+# When ready for production
+git checkout main
+git merge development
+git push origin main
 
 ---
 

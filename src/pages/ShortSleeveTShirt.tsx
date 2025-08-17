@@ -358,7 +358,7 @@ const SizeGuideAccordion: React.FC = () => {
 
 
 // Fulfillment Providers Section Component
-const FulfillmentProvidersSection: React.FC = () => {
+const FulfillmentProvidersSection: React.FC<{ onStartDesigning: () => void }> = ({ onStartDesigning }) => {
   const [sortBy, setSortBy] = useState<string>('rating');
   const [selectedProvider, setSelectedProvider] = useState<number | null>(null);
 
@@ -466,6 +466,7 @@ const FulfillmentProvidersSection: React.FC = () => {
             <Button
               variant="contained"
               size="large"
+              onClick={onStartDesigning}
               sx={{
                 backgroundColor: 'white',
                 color: '#667eea',
@@ -667,6 +668,7 @@ const FulfillmentProvidersSection: React.FC = () => {
                         <Button
                           variant="contained"
                           fullWidth
+                          onClick={onStartDesigning}
                           sx={{
                             backgroundColor: '#667eea',
                             fontWeight: 600,
@@ -822,7 +824,7 @@ const ProductDetailsAccordion: React.FC = () => {
 };
 
 // Fulfillment Options Accordion Component
-const FulfillmentOptionsAccordion: React.FC = () => {
+const FulfillmentOptionsAccordion: React.FC<{ onStartDesigning: () => void }> = ({ onStartDesigning }) => {
   return (
     <Accordion
       defaultExpanded
@@ -867,7 +869,7 @@ const FulfillmentOptionsAccordion: React.FC = () => {
         <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3, maxWidth: 600 }}>
           Choose from our network of trusted fulfillment providers. Each provider offers different pricing, production times, and shipping options to meet your specific needs.
         </Typography>
-        <FulfillmentProvidersSection />
+        <FulfillmentProvidersSection onStartDesigning={onStartDesigning} />
       </AccordionDetails>
     </Accordion>
   );
@@ -1396,49 +1398,69 @@ const ShortSleeveTShirt: React.FC = () => {
                    </Typography>
                  </Box>
 
-                 {/* Action Buttons */}
-                 <Stack spacing={2}>
-                   <Button
-                     variant="contained"
-                     fullWidth
-                     size="medium"
-                     startIcon={<Storefront />}
-                     sx={{
-                       borderRadius: 2,
-                       textTransform: 'none',
-                       fontWeight: 600,
-                       py: 1.5,
-                       backgroundColor: '#10b981',
-                       '&:hover': { 
-                         backgroundColor: '#059669',
-                         transform: 'translateY(-1px)'
-                       }
-                     }}
-                   >
-                     Add to Store
-                   </Button>
-                   <Button
-                     variant="outlined"
-                     fullWidth
-                     size="medium"
-                     startIcon={<ShoppingCart />}
-                     sx={{
-                       borderRadius: 2,
-                       textTransform: 'none',
-                       fontWeight: 600,
-                       py: 1.5,
-                       borderColor: '#3b82f6',
-                       color: '#3b82f6',
-                       '&:hover': { 
-                         borderColor: '#2563eb', 
-                         backgroundColor: 'rgba(59, 130, 246, 0.08)',
-                         transform: 'translateY(-1px)'
-                       }
-                     }}
-                   >
-                     Create Order
-                   </Button>
-                 </Stack>
+                                   {/* Action Buttons */}
+                  <Stack spacing={2}>
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      size="medium"
+                      startIcon={<Storefront />}
+                      sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        py: 1.5,
+                        backgroundColor: '#10b981',
+                        '&:hover': { 
+                          backgroundColor: '#059669',
+                          transform: 'translateY(-1px)'
+                        }
+                      }}
+                    >
+                      Add to Store
+                    </Button>
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      size="medium"
+                      startIcon={<Print />}
+                      onClick={() => navigate('/app/designer')}
+                      sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        py: 1.5,
+                        backgroundColor: '#667eea',
+                        '&:hover': { 
+                          backgroundColor: '#5a67d8',
+                          transform: 'translateY(-1px)'
+                        }
+                      }}
+                    >
+                      Start Designing
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      fullWidth
+                      size="medium"
+                      startIcon={<ShoppingCart />}
+                      sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        py: 1.5,
+                        borderColor: '#3b82f6',
+                        color: '#3b82f6',
+                        '&:hover': { 
+                          borderColor: '#2563eb', 
+                          backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                          transform: 'translateY(-1px)'
+                        }
+                      }}
+                    >
+                      Create Order
+                    </Button>
+                  </Stack>
 
                  {/* Fulfillment Info */}
                  <Box sx={{ 
@@ -1513,7 +1535,7 @@ const ShortSleeveTShirt: React.FC = () => {
             <PrintAreasAccordion />
 
             {/* Fulfillment Section */}
-            <FulfillmentOptionsAccordion />
+                         <FulfillmentOptionsAccordion onStartDesigning={() => navigate('/app/designer')} />
 
             {/* Reviews Section */}
             <CustomerReviewsAccordion />
