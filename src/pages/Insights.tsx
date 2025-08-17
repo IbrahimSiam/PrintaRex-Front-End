@@ -235,11 +235,155 @@ const CATEGORY_DATA: CategoryData[] = [
   { name: 'Accessories', orders: 140, revenue: 2100, percentage: 15 }
 ];
 
+// Flag component that works across all browsers
+const FlagIcon = ({ countryCode }: { countryCode: string }): React.ReactElement => {
+  const getFlagPattern = (code: string): React.ReactElement => {
+    switch (code) {
+      case 'US':
+        return (
+          <Box sx={{ position: 'relative', width: 24, height: 16, backgroundColor: '#FFFFFF' }}>
+            {/* Red stripes - 13 total stripes */}
+            <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1.2, backgroundColor: '#B22234' }} />
+            <Box sx={{ position: 'absolute', top: 2.4, left: 0, right: 0, height: 1.2, backgroundColor: '#B22234' }} />
+            <Box sx={{ position: 'absolute', top: 4.8, left: 0, right: 0, height: 1.2, backgroundColor: '#B22234' }} />
+            <Box sx={{ position: 'absolute', top: 7.2, left: 0, right: 0, height: 1.2, backgroundColor: '#B22234' }} />
+            <Box sx={{ position: 'absolute', top: 9.6, left: 0, right: 0, height: 1.2, backgroundColor: '#B22234' }} />
+            <Box sx={{ position: 'absolute', top: 12, left: 0, right: 0, height: 1.2, backgroundColor: '#B22234' }} />
+            <Box sx={{ position: 'absolute', top: 14.4, left: 0, right: 0, height: 1.2, backgroundColor: '#B22234' }} />
+            {/* Blue canton */}
+            <Box sx={{ position: 'absolute', top: 0, left: 0, width: 9.6, height: 8.4, backgroundColor: '#3C3B6E' }} />
+            {/* White stars - 5-pointed star pattern */}
+            <Box sx={{ position: 'absolute', top: 0.8, left: 0.8, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 0.8, left: 2.4, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 0.8, left: 4, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 0.8, left: 5.6, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 0.8, left: 7.2, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 2.4, left: 1.6, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 2.4, left: 3.2, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 2.4, left: 4.8, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 2.4, left: 6.4, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 4, left: 0.8, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 4, left: 2.4, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 4, left: 4, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 4, left: 5.6, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+            <Box sx={{ position: 'absolute', top: 4, left: 7.2, width: 1.2, height: 1.2, color: 'white', fontSize: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ★
+            </Box>
+          </Box>
+        );
+      case 'GB':
+        return (
+          <Box sx={{ position: 'relative', width: 24, height: 16, backgroundColor: '#012169' }}>
+            {/* White cross of St. Andrew */}
+            <Box sx={{ position: 'absolute', top: 6.4, left: 0, right: 0, height: 3.2, backgroundColor: 'white' }} />
+            <Box sx={{ position: 'absolute', top: 0, left: 9.6, bottom: 0, width: 4.8, backgroundColor: 'white' }} />
+            {/* Red cross of St. George */}
+            <Box sx={{ position: 'absolute', top: 7.2, left: 0, right: 0, height: 1.6, backgroundColor: '#C8102E' }} />
+            <Box sx={{ position: 'absolute', top: 0, left: 10.4, bottom: 0, width: 3.2, backgroundColor: '#C8102E' }} />
+            {/* Red cross of St. Patrick (diagonal) */}
+            <Box sx={{ 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              width: '100%', 
+              height: '100%',
+              background: 'linear-gradient(45deg, transparent 45%, #C8102E 45%, #C8102E 55%, transparent 55%)'
+            }} />
+            <Box sx={{ 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              width: '100%', 
+              height: '100%',
+              background: 'linear-gradient(-45deg, transparent 45%, #C8102E 45%, #C8102E 55%, transparent 55%)'
+            }} />
+          </Box>
+        );
+      case 'DE':
+        return (
+          <Box sx={{ width: 24, height: 16 }}>
+            <Box sx={{ height: 5.33, backgroundColor: '#000000' }} />
+            <Box sx={{ height: 5.33, backgroundColor: '#DD0000' }} />
+            <Box sx={{ height: 5.34, backgroundColor: '#FFCE00' }} />
+          </Box>
+        );
+      case 'CA':
+        return (
+          <Box sx={{ position: 'relative', width: 24, height: 16, backgroundColor: '#FF0000' }}>
+            {/* White center stripe */}
+            <Box sx={{ position: 'absolute', top: 2, left: 6, right: 6, bottom: 2, backgroundColor: 'white' }} />
+            {/* Red maple leaf - more detailed */}
+            <Box sx={{ 
+              position: 'absolute', 
+              top: 3, 
+              left: 8, 
+              width: 8, 
+              height: 10, 
+              color: '#FF0000', 
+              fontSize: '10px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              fontWeight: 'bold'
+            }}>
+              🍁
+            </Box>
+          </Box>
+        );
+      default:
+        return (
+          <Box sx={{ 
+            width: 24, 
+            height: 16, 
+            backgroundColor: '#666666', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            color: 'white', 
+            fontSize: '8px', 
+            fontWeight: 'bold',
+            borderRadius: 1
+          }}>
+            {countryCode}
+          </Box>
+        );
+    }
+  };
+
+  return getFlagPattern(countryCode);
+};
+
 const COUNTRY_DATA: CountryData[] = [
-  { country: 'United States', flag: '🇺🇸', orders: 1200, revenue: 18000, percentage: 40 },
-  { country: 'United Kingdom', flag: '🇬🇧', orders: 800, revenue: 12000, percentage: 25 },
-  { country: 'Germany', flag: '🇩🇪', orders: 600, revenue: 9000, percentage: 20 },
-  { country: 'Canada', flag: '🇨🇦', orders: 400, revenue: 6000, percentage: 15 }
+  { country: 'United States', flag: 'US', orders: 1200, revenue: 18000, percentage: 40 },
+  { country: 'United Kingdom', flag: 'GB', orders: 800, revenue: 12000, percentage: 25 },
+  { country: 'Germany', flag: 'DE', orders: 600, revenue: 9000, percentage: 20 },
+  { country: 'Canada', flag: 'CA', orders: 400, revenue: 6000, percentage: 15 }
 ];
 
 // Filter options
@@ -511,7 +655,7 @@ export default function Insights() {
             <TableRow key={row.country}>
               <TableCell>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <span style={{ fontSize: '1.2rem' }}>{row.flag}</span>
+                  <FlagIcon countryCode={row.flag} />
                   <Typography variant="body2">{row.country}</Typography>
                 </Box>
               </TableCell>
