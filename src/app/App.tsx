@@ -34,6 +34,7 @@ import BrandedPackaging from '../pages/BrandedPackaging';
 import Insights from '../pages/Insights';
 import SignUp from '../pages/SignUp';
 import Login from '../pages/Login';
+import Templates from '../pages/Templates';
 
 import PlaceholderPage from '../components/PlaceholderPage';
 
@@ -105,6 +106,7 @@ const App: React.FC = () => {
           <Route path="/stores" element={<SalesChannels />} />
           <Route path="/branded-packing" element={<BrandedPackaging />} />
           <Route path="/insights" element={<Insights />} />
+          <Route path="/templates" element={<Templates />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/pricing" element={<PlaceholderPage title="Pricing" message="Pricing information will be available soon!" />} />
