@@ -65,8 +65,8 @@ const ReviewView: React.FC = () => {
       {/* Enhanced Left Sidebar */}
       <EnhancedDesignerSidebar />
 
-      {/* Professional Tool Panel - Only show when a tool is selected */}
-      {activeTool && <ProfessionalToolPanel isVisible={true} />}
+      {/* Right Tool Panel */}
+      {activeTool && <ProfessionalToolPanel />}
 
       {/* Main Content - Now centered and clean */}
       <Box sx={{ 

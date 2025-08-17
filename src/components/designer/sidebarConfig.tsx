@@ -1,34 +1,18 @@
+import React from 'react';
 import {
-  Palette,
-  FileCopy,
-  TextFields,
-  Category,
-  Image,
-  Layers,
-  Person,
-  Collections,
-  ViewModule,
-  CropSquare,
-  Settings,
-  Brush,
-  FormatSize,
-  AutoAwesome,
-  GridOn,
-  ColorLens,
-  Save,
-  Preview,
-  ShoppingCart,
+  Checkroom, CloudUpload, TextFields, ViewModule, Image, Layers,
+  Person, Folder, GridOn, Search, CropSquare, Settings, Help,
+  Palette, Brush, AutoAwesome
 } from '@mui/icons-material';
-import { SidebarTool } from '../../stores/sidebarStore';
 
 export interface SidebarItem {
-  id: SidebarTool;
-  label: string;
+  id: string;
   icon: React.ReactNode;
+  label: string;
+  description: string;
+  category: 'design' | 'product' | 'settings';
   color: string;
   shortcut?: string;
-  description: string;
-  category: 'design' | 'product' | 'preview' | 'settings';
 }
 
 export interface SidebarGroup {
@@ -39,138 +23,165 @@ export interface SidebarGroup {
 
 export const SIDEBAR_GROUPS: SidebarGroup[] = [
   {
+    id: 'product',
+    title: 'Product & Files',
+    items: [
+      {
+        id: 'product',
+        icon: <Checkroom />,
+        label: 'Product',
+        description: 'Manage product settings and properties',
+        category: 'product' as const,
+        color: '#1976d2'
+      },
+      {
+        id: 'files',
+        icon: <CloudUpload />,
+        label: 'Files & Uploads',
+        description: 'Upload and manage design files',
+        category: 'product' as const,
+        color: '#2e7d32'
+      }
+    ]
+  },
+  {
     id: 'design',
     title: 'Design Tools',
     items: [
       {
         id: 'text',
-        label: 'Text Tool',
         icon: <TextFields />,
-        color: '#f57c00',
-        shortcut: 'T',
+        label: 'Text',
         description: 'Add and edit text elements',
-        category: 'design',
+        category: 'design' as const,
+        color: '#d32f2f',
+        shortcut: 'T'
+      },
+      {
+        id: 'templates',
+        icon: <ViewModule />,
+        label: 'Templates',
+        description: 'Browse and apply design templates',
+        category: 'design' as const,
+        color: '#7b1fa2',
+        shortcut: 'M'
       },
       {
         id: 'graphics',
-        label: 'Graphics Library',
         icon: <Image />,
-        color: '#d32f2f',
-        shortcut: 'G',
-        description: 'Access icons, shapes, and illustrations',
-        category: 'design',
-      },
-      {
-        id: 'shapes',
-        label: 'Shapes',
-        icon: <CropSquare />,
-        color: '#7b1fa2',
-        shortcut: 'S',
-        description: 'Add geometric shapes and forms',
-        category: 'design',
+        label: 'Graphics & Images',
+        description: 'Add images and graphics to your design',
+        category: 'design' as const,
+        color: '#388e3c',
+        shortcut: 'G'
       },
       {
         id: 'layers',
-        label: 'Layers',
         icon: <Layers />,
-        color: '#1976d2',
-        shortcut: 'L',
-        description: 'Manage design element layers',
-        category: 'design',
-      },
-      {
-        id: 'layouts',
-        label: 'Layouts',
-        icon: <ViewModule />,
-        color: '#388e3c',
-        shortcut: 'Y',
-        description: 'Choose layout presets and grids',
-        category: 'design',
-      },
-      {
-        id: 'files',
-        label: 'Upload Files',
-        icon: <FileCopy />,
-        color: '#388e3c',
-        shortcut: 'U',
-        description: 'Import images and graphics',
-        category: 'design',
-      },
-    ],
-  },
-  {
-    id: 'product',
-    title: 'Product Settings',
-    items: [
-      {
-        id: 'product',
-        label: 'Product Info',
-        icon: <Palette />,
-        color: '#1976d2',
-        shortcut: 'P',
-        description: 'Configure product specifications',
-        category: 'product',
+        label: 'Layers',
+        description: 'Manage design layers and stacking order',
+        category: 'design' as const,
+        color: '#f57c00',
+        shortcut: 'L'
       },
       {
         id: 'personalize',
-        label: 'Personalize',
         icon: <Person />,
-        color: '#388e3c',
-        shortcut: 'I',
-        description: 'Add customization options',
-        category: 'product',
+        label: 'Personalize',
+        description: 'Customize design elements',
+        category: 'design' as const,
+        color: '#c2185b'
       },
       {
         id: 'collections',
+        icon: <Folder />,
         label: 'Collections',
-        icon: <Collections />,
-        color: '#f57c00',
-        shortcut: 'C',
-        description: 'Organize designs by theme',
-        category: 'product',
+        description: 'Access design collections and libraries',
+        category: 'design' as const,
+        color: '#5d4037'
       },
-    ],
-  },
-  {
-    id: 'preview',
-    title: 'Preview & Save',
-    items: [
       {
-        id: 'templates',
-        label: 'Templates',
-        icon: <Category />,
-        color: '#7b1fa2',
-        shortcut: 'M',
-        description: 'Save and load design templates',
-        category: 'preview',
+        id: 'layouts',
+        icon: <GridOn />,
+        label: 'Layouts',
+        description: 'Choose from various layout options',
+        category: 'design' as const,
+        color: '#455a64'
       },
-    ],
+      {
+        id: 'shutterstock',
+        icon: <Search />,
+        label: 'Stock Images',
+        description: 'Browse stock photos and graphics',
+        category: 'design' as const,
+        color: '#ff6f00'
+      },
+      {
+        id: 'shapes',
+        icon: <CropSquare />,
+        label: 'Shapes',
+        description: 'Add geometric shapes to your design',
+        category: 'design' as const,
+        color: '#6a1b9a'
+      },
+      {
+        id: 'effects',
+        icon: <AutoAwesome />,
+        label: 'Effects',
+        description: 'Apply visual effects and filters',
+        category: 'design' as const,
+        color: '#e91e63'
+      },
+      {
+        id: 'brushes',
+        icon: <Brush />,
+        label: 'Brushes',
+        description: 'Use various brush tools for drawing',
+        category: 'design' as const,
+        color: '#795548'
+      },
+      {
+        id: 'palette',
+        icon: <Palette />,
+        label: 'Color Palette',
+        description: 'Manage colors and color schemes',
+        category: 'design' as const,
+        color: '#ff9800'
+      }
+    ]
   },
   {
     id: 'settings',
-    title: 'Settings',
+    title: 'Settings & Help',
     items: [
       {
         id: 'settings',
-        label: 'Preferences',
         icon: <Settings />,
-        color: '#616161',
-        shortcut: ',',
-        description: 'Configure tool preferences',
-        category: 'settings',
+        label: 'Settings',
+        description: 'Configure application preferences',
+        category: 'settings' as const,
+        color: '#607d8b'
       },
-    ],
-  },
+      {
+        id: 'help',
+        icon: <Help />,
+        label: 'Help',
+        description: 'Get help and view tutorials',
+        category: 'settings' as const,
+        color: '#9e9e9e'
+      }
+    ]
+  }
 ];
 
 export const ALL_SIDEBAR_ITEMS: SidebarItem[] = SIDEBAR_GROUPS.flatMap(group => group.items);
 
-export const getSidebarItem = (id: SidebarTool): SidebarItem | undefined => {
+export const getSidebarItem = (id: string): SidebarItem | undefined => {
   return ALL_SIDEBAR_ITEMS.find(item => item.id === id);
 };
 
 export const getSidebarItemByShortcut = (shortcut: string): SidebarItem | undefined => {
-  return ALL_SIDEBAR_ITEMS.find(item => item.shortcut === shortcut.toUpperCase());
+  return ALL_SIDEBAR_ITEMS.find(item => item.shortcut === shortcut);
 };
 
 export const getSidebarItemsByCategory = (category: SidebarItem['category']): SidebarItem[] => {

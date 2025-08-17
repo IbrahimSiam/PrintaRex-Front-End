@@ -1,382 +1,454 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Box, Drawer, List, ListItem, ListItemIcon, ListItemButton, ListItemText,
+  Box, Drawer, List, ListItem, ListItemIcon, ListItemButton,
   Typography, useTheme, useMediaQuery, Tooltip, IconButton, Divider, Fade,
   Slide, Fab, Menu, MenuItem, FormControlLabel, Switch, Slider, Collapse,
+  Paper, Badge, Chip
 } from '@mui/material';
 import {
-  ChevronLeft, ChevronRight, Menu as MenuIcon, Settings as SettingsIcon,
-  ExpandMore, ExpandLess,
+  Checkroom, CloudUpload, TextFields, ViewModule, Image, Layers,
+  Person, Folder, GridOn, Search, CropSquare, Settings, Help,
+  ChevronLeft, ChevronRight, PushPin, PushPinOutlined, ExpandMore,
+  ExpandLess, Add, Remove, Palette, Brush, AutoAwesome, Star
 } from '@mui/icons-material';
 import { useSidebarStore } from '../../stores/sidebarStore';
-import { SIDEBAR_GROUPS, SidebarItem } from './sidebarConfig';
+
+interface SidebarItem {
+  id: string;
+  icon: React.ReactNode;
+  label: string;
+  category: 'design' | 'product' | 'settings';
+  badge?: number;
+  disabled?: boolean;
+}
+
+const SIDEBAR_ITEMS: SidebarItem[] = [
+  // Product & Files
+  { id: 'product', icon: <Checkroom />, label: 'Product', category: 'product' },
+  { id: 'files', icon: <CloudUpload />, label: 'Files & Uploads', category: 'product' },
+  
+  // Design Tools
+  { id: 'text', icon: <TextFields />, label: 'Text', category: 'design' },
+  { id: 'templates', icon: <ViewModule />, label: 'Templates', category: 'design' },
+  { id: 'graphics', icon: <Image />, label: 'Graphics & Images', category: 'design' },
+  { id: 'layers', icon: <Layers />, label: 'Layers', category: 'design' },
+  { id: 'personalize', icon: <Person />, label: 'Personalize', category: 'design' },
+  { id: 'collections', icon: <Folder />, label: 'Collections', category: 'design' },
+  { id: 'layouts', icon: <GridOn />, label: 'Layouts', category: 'design' },
+  { id: 'shutterstock', icon: <Search />, label: 'Stock Images', category: 'design' },
+  { id: 'shapes', icon: <CropSquare />, label: 'Shapes', category: 'design' },
+  { id: 'effects', icon: <AutoAwesome />, label: 'Effects', category: 'design' },
+  { id: 'brushes', icon: <Brush />, label: 'Brushes', category: 'design' },
+  { id: 'palette', icon: <Palette />, label: 'Color Palette', category: 'design' },
+  
+  // Settings & Help
+  { id: 'settings', icon: <Settings />, label: 'Settings', category: 'settings' },
+  { id: 'help', icon: <Help />, label: 'Help', category: 'settings' },
+];
 
 const EnhancedDesignerSidebar: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
-
-  const {
-    mode, setMode, activeTool, setActiveTool, autoCollapse, setAutoCollapse,
-    autoCollapseDelay, setAutoCollapseDelay, setIsMobile, resetAutoCollapseTimer,
-    togglePanel, closePanel,
+  
+  const { 
+    activeTool, 
+    setActiveTool, 
+    isCollapsed, 
+    setIsCollapsed,
+    isPinned,
+    setIsPinned,
+    showLabels,
+    setShowLabels
   } = useSidebarStore();
 
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['design']));
-  const [settingsMenuAnchor, setSettingsMenuAnchor] = useState<null | HTMLElement>(null);
-  const [showFloatingButton, setShowFloatingButton] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [expandedCategories, setExpandedCategories] = useState({
+    design: true,
+    product: true,
+    settings: true
+  });
 
-  // Set mobile state
-  useEffect(() => {
-    setIsMobile(isMobile);
-  }, [isMobile, setIsMobile]);
-
-  // Auto-collapse timer
-  useEffect(() => {
-    if (autoCollapse && activeTool) {
-      resetAutoCollapseTimer();
-    }
-  }, [activeTool, autoCollapse, resetAutoCollapseTimer]);
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey) return; // Don't interfere with browser shortcuts
-      
-      const shortcut = e.key.toUpperCase();
-      const tool = SIDEBAR_GROUPS.flatMap(group => group.items).find(item => item.shortcut === shortcut);
-      
-      if (tool) {
-        e.preventDefault();
-        togglePanel(tool.id);
-      }
-      
-      // Escape to close panel
-      if (e.key === 'Escape' && activeTool) {
-        closePanel();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeTool, togglePanel, closePanel]);
-
-  // Responsive mode
-  useEffect(() => {
-    if (isTablet && mode === 'expanded') {
-      setMode('collapsed');
-    }
-  }, [isTablet, mode, setMode]);
+  const sidebarWidth = isCollapsed ? 64 : 240;
+  const iconSize = 24;
 
   const handleToolClick = (toolId: string) => {
-    togglePanel(toolId as any);
-  };
-
-  const handleGroupToggle = (groupId: string) => {
-    const newExpanded = new Set(expandedGroups);
-    if (newExpanded.has(groupId)) {
-      newExpanded.delete(groupId);
-    } else {
-      newExpanded.add(groupId);
-    }
-    setExpandedGroups(newExpanded);
-  };
-
-  const toggleMode = () => {
-    if (mode === 'expanded') {
-      setMode('collapsed');
-    } else if (mode === 'collapsed') {
-      setMode('expanded');
-    } else {
-      setMode('collapsed');
+    setActiveTool(toolId);
+    // Auto-collapse on mobile after selection
+    if (isMobile && !isPinned) {
+      setIsCollapsed(true);
     }
   };
 
-  const renderToolItem = (item: SidebarItem, isCollapsed: boolean) => {
+  const toggleCategory = (category: keyof typeof expandedCategories) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [category]: !prev[category]
+    }));
+  };
+
+  const renderSidebarItem = (item: SidebarItem) => {
     const isActive = activeTool === item.id;
-    
+    const isHovered = hoveredItem === item.id;
+
     return (
-      <ListItem key={item.id} disablePadding sx={{ mb: 0.5 }}>
-        <ListItemButton
-          onClick={() => handleToolClick(item.id)}
+      <Tooltip
+        title={item.label}
+        placement="right"
+        disableHoverListener={!isCollapsed && showLabels}
+        arrow
+      >
+        <ListItem
+          disablePadding
           sx={{
-            minHeight: 48,
-            borderRadius: 1,
-            mx: 0.5,
-            bgcolor: isActive ? `${item.color}20` : 'transparent',
-            border: isActive ? `1px solid ${item.color}40` : '1px solid transparent',
-            '&:hover': {
-              bgcolor: isActive ? `${item.color}30` : 'rgba(0, 0, 0, 0.04)',
-            },
-            transition: theme.transitions.create(['background-color', 'border-color'], {
-              duration: theme.transitions.duration.shortest,
-            }),
+            mb: 0.5,
+            mx: 1,
+            borderRadius: 2,
+            overflow: 'hidden'
           }}
         >
-          <ListItemIcon
+          <ListItemButton
+            onClick={() => handleToolClick(item.id)}
+            onMouseEnter={() => setHoveredItem(item.id)}
+            onMouseLeave={() => setHoveredItem(null)}
+            disabled={item.disabled}
             sx={{
-              minWidth: isCollapsed ? 40 : 48,
-              color: isActive ? item.color : 'text.secondary',
-              '& .MuiSvgIcon-root': {
-                fontSize: isCollapsed ? 20 : 24,
+              minHeight: 48,
+              px: isCollapsed ? 2 : 3,
+              py: 1.5,
+              borderRadius: 2,
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              backgroundColor: isActive 
+                ? 'primary.main' 
+                : isHovered 
+                  ? 'action.hover' 
+                  : 'transparent',
+              color: isActive 
+                ? 'primary.contrastText' 
+                : isHovered 
+                  ? 'text.primary' 
+                  : 'text.secondary',
+              '&:hover': {
+                backgroundColor: isActive 
+                  ? 'primary.dark' 
+                  : 'action.hover',
+                transform: 'translateX(4px)',
+                boxShadow: isActive 
+                  ? '0 4px 12px rgba(0,0,0,0.15)' 
+                  : '0 2px 8px rgba(0,0,0,0.1)'
               },
+              '&.Mui-disabled': {
+                opacity: 0.4
+              }
             }}
           >
-            {item.icon}
-          </ListItemIcon>
-          
-          {!isCollapsed && (
-            <ListItemText
-              primary={item.label}
-              primaryTypographyProps={{
-                fontSize: '0.875rem',
-                fontWeight: isActive ? 600 : 400,
-                color: isActive ? item.color : 'text.primary',
+            <ListItemIcon
+              sx={{
+                minWidth: isCollapsed ? 'auto' : 40,
+                color: 'inherit',
+                '& .MuiSvgIcon-root': {
+                  fontSize: iconSize,
+                  transition: 'all 0.2s ease'
+                }
               }}
-            />
-          )}
-        </ListItemButton>
-      </ListItem>
+            >
+              {item.badge ? (
+                <Badge badgeContent={item.badge} color="error" max={99}>
+                  {item.icon}
+                </Badge>
+              ) : (
+                item.icon
+              )}
+            </ListItemIcon>
+            
+            {(!isCollapsed && showLabels) && (
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: isActive ? 600 : 500,
+                  fontSize: '0.875rem',
+                  ml: 1,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
+                {item.label}
+              </Typography>
+            )}
+          </ListItemButton>
+        </ListItem>
+      </Tooltip>
     );
   };
 
-  const renderSidebarContent = () => {
-    const isCollapsed = mode === 'collapsed';
-    
+  const renderCategorySection = (category: keyof typeof expandedCategories, items: SidebarItem[]) => {
+    const categoryLabels = {
+      product: 'Product & Files',
+      design: 'Design Tools',
+      settings: 'Settings & Help'
+    };
+
     return (
-      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        {/* Header */}
-        <Box
-          sx={{
-            p: 2,
-            borderBottom: '1px solid #e0e0e0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            minHeight: 64,
-          }}
-        >
-          {!isCollapsed && (
-            <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
-              Tools
+      <Box key={category}>
+        {(!isCollapsed && showLabels) && (
+          <Box
+            onClick={() => toggleCategory(category)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              px: 3,
+              py: 1.5,
+              cursor: 'pointer',
+              '&:hover': {
+                backgroundColor: 'action.hover',
+                borderRadius: 1
+              }
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 600,
+                color: 'text.secondary',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontSize: '0.75rem'
+              }}
+            >
+              {categoryLabels[category]}
             </Typography>
-          )}
-          
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Tooltip title="Settings">
-              <IconButton
-                size="small"
-                onClick={(e) => setSettingsMenuAnchor(e.currentTarget)}
-                sx={{ color: 'text.secondary' }}
-              >
-                <SettingsIcon />
-              </IconButton>
-            </Tooltip>
+            {expandedCategories[category] ? <ExpandLess sx={{ ml: 'auto', fontSize: 16 }} /> : <ExpandMore sx={{ ml: 'auto', fontSize: 16 }} />}
           </Box>
-        </Box>
-
-        {/* Tool Groups */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 1 }}>
-          {SIDEBAR_GROUPS.map((group) => (
-            <Box key={group.id} sx={{ mb: 2 }}>
-              {!isCollapsed && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    px: 1,
-                    py: 0.5,
-                    mb: 1,
-                  }}
-                >
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontWeight: 600,
-                      color: 'text.secondary',
-                      textTransform: 'uppercase',
-                      letterSpacing: 0.5,
-                    }}
-                  >
-                    {group.title}
-                  </Typography>
-                  
-                  <IconButton
-                    size="small"
-                    onClick={() => handleGroupToggle(group.id)}
-                    sx={{ color: 'text.secondary' }}
-                  >
-                    {expandedGroups.has(group.id) ? <ExpandLess /> : <ExpandMore />}
-                  </IconButton>
-                </Box>
-              )}
-              
-              <Collapse in={isCollapsed || expandedGroups.has(group.id)}>
-                <List disablePadding>
-                  {group.items.map((item) => renderToolItem(item, isCollapsed))}
-                </List>
-              </Collapse>
-              
-              {!isCollapsed && <Divider sx={{ mt: 1 }} />}
-            </Box>
-          ))}
-        </Box>
-
-        {/* Footer */}
-        {!isCollapsed && (
-          <Box sx={{ p: 2, borderTop: '1px solid #e0e0e0' }}>
-            <FormControlLabel
-              control={
-                <Switch
-                  size="small"
-                  checked={autoCollapse}
-                  onChange={(e) => setAutoCollapse(e.target.checked)}
-                />
-              }
-              label={
-                <Typography variant="caption" color="text.secondary">
-                  Auto-collapse panels
-                </Typography>
-              }
-            />
-          </Box>
+        )}
+        
+        <Collapse in={expandedCategories[category]}>
+          <List disablePadding>
+            {items.map(renderSidebarItem)}
+          </List>
+        </Collapse>
+        
+        {category !== 'settings' && (
+          <Divider 
+            sx={{ 
+              my: 2, 
+              mx: 2, 
+              opacity: 0.3,
+              display: isCollapsed ? 'none' : 'block'
+            }} 
+          />
         )}
       </Box>
     );
   };
 
-  const renderFloatingButton = () => {
-    if (mode !== 'hidden') return null;
-    
-    return (
-      <Fab
-        color="primary"
-        size="medium"
-        onClick={() => setMode('collapsed')}
-        sx={{
-          position: 'fixed',
-          top: 20,
-          left: 20,
-          zIndex: 1200,
-        }}
-      >
-        <MenuIcon />
-      </Fab>
-    );
+  const groupedItems = {
+    product: SIDEBAR_ITEMS.filter(item => item.category === 'product'),
+    design: SIDEBAR_ITEMS.filter(item => item.category === 'design'),
+    settings: SIDEBAR_ITEMS.filter(item => item.category === 'settings')
   };
-
-  const renderSettingsMenu = () => (
-    <Menu
-      anchorEl={settingsMenuAnchor}
-      open={Boolean(settingsMenuAnchor)}
-      onClose={() => setSettingsMenuAnchor(null)}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-    >
-      <MenuItem>
-        <FormControlLabel
-          control={
-            <Switch
-              size="small"
-              checked={autoCollapse}
-              onChange={(e) => setAutoCollapse(e.target.checked)}
-            />
-          }
-          label="Auto-collapse panels"
-          sx={{ m: 0 }}
-        />
-      </MenuItem>
-      
-      <MenuItem>
-        <Typography variant="body2" sx={{ px: 1, py: 0.5 }}>
-          Auto-collapse delay: {autoCollapseDelay / 1000}s
-        </Typography>
-      </MenuItem>
-      
-      <MenuItem>
-        <Box sx={{ px: 1, py: 0.5, width: 200 }}>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            Auto-collapse delay
-          </Typography>
-          <Slider
-            size="small"
-            value={autoCollapseDelay / 1000}
-            onChange={(_, value) => setAutoCollapseDelay((value as number) * 1000)}
-            min={5}
-            max={60}
-            step={5}
-            marks
-            valueLabelDisplay="auto"
-            valueLabelFormat={(value) => `${value}s`}
-          />
-        </Box>
-      </MenuItem>
-    </Menu>
-  );
-
-  if (mode === 'hidden') {
-    return (
-      <>
-        {renderFloatingButton()}
-        {renderSettingsMenu()}
-      </>
-    );
-  }
-
-  const sidebarWidth = mode === 'expanded' ? 280 : 64;
 
   return (
     <>
+      {/* Main Sidebar */}
       <Drawer
         variant="permanent"
         sx={{
           width: sidebarWidth,
           flexShrink: 0,
-          transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-          }),
           '& .MuiDrawer-paper': {
             width: sidebarWidth,
-            transition: theme.transitions.create('width', {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.enteringScreen,
-            }),
-            border: 'none',
-            bgcolor: '#fafafa',
-            borderRight: '1px solid #e0e0e0',
+            backgroundColor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
+            borderRight: `1px solid ${theme.palette.divider}`,
+            transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             overflow: 'hidden',
-          },
+            boxShadow: '2px 0 8px rgba(0,0,0,0.1)'
+          }
         }}
       >
-        {/* Toggle Button */}
-        <Box sx={{ position: 'absolute', top: 8, right: -12, zIndex: 1 }}>
-          <Tooltip title={mode === 'expanded' ? 'Collapse Sidebar' : 'Expand Sidebar'}>
-            <IconButton 
-              size="small" 
-              onClick={toggleMode} 
-              sx={{ 
-                bgcolor: 'white',
-                border: '1px solid #e0e0e0',
-                '&:hover': { bgcolor: '#f5f5f5' },
+        {/* Sidebar Header */}
+        <Box
+          sx={{
+            p: 2,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            minHeight: 64
+          }}
+        >
+          {!isCollapsed && (
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                color: 'primary.main',
+                fontSize: '1.1rem'
               }}
             >
-              {mode === 'expanded' ? <ChevronLeft /> : <ChevronRight />}
-            </IconButton>
-          </Tooltip>
+              Designer
+            </Typography>
+          )}
+          
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <Tooltip title={isPinned ? 'Unpin Sidebar' : 'Pin Sidebar'}>
+              <IconButton
+                size="small"
+                onClick={() => setIsPinned(!isPinned)}
+                sx={{
+                  color: isPinned ? 'primary.main' : 'text.secondary',
+                  '&:hover': {
+                    backgroundColor: 'action.hover'
+                  }
+                }}
+              >
+                {isPinned ? <PushPin /> : <PushPinOutlined />}
+              </IconButton>
+            </Tooltip>
+            
+            <Tooltip title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}>
+              <IconButton
+                size="small"
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                sx={{
+                  color: 'text.secondary',
+                  '&:hover': {
+                    backgroundColor: 'action.hover'
+                  }
+                }}
+              >
+                {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
 
         {/* Sidebar Content */}
-        <Slide direction="right" in={true} mountOnEnter unmountOnExit>
-          <Box sx={{ height: '100%' }}>
-            {renderSidebarContent()}
+        <Box
+          sx={{
+            flex: 1,
+            overflow: 'auto',
+            py: 1
+          }}
+        >
+          {renderCategorySection('product', groupedItems.product)}
+          {renderCategorySection('design', groupedItems.design)}
+          {renderCategorySection('settings', groupedItems.settings)}
+        </Box>
+
+        {/* Sidebar Footer */}
+        {!isCollapsed && (
+          <Box
+            sx={{
+              p: 2,
+              borderTop: `1px solid ${theme.palette.divider}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Switch
+                  size="small"
+                  checked={showLabels}
+                  onChange={(e) => setShowLabels(e.target.checked)}
+                />
+              }
+              label={
+                <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
+                  Labels
+                </Typography>
+              }
+            />
           </Box>
-        </Slide>
+        )}
       </Drawer>
 
-      {renderFloatingButton()}
-      {renderSettingsMenu()}
+      {/* Floating Tool Panel (Right Side) */}
+      {activeTool && (
+        <Slide direction="left" in={!!activeTool} mountOnEnter unmountOnExit>
+          <Box
+            sx={{
+              position: 'fixed',
+              right: 24,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 1200,
+              width: 320,
+              maxHeight: '80vh',
+              overflow: 'auto'
+            }}
+          >
+            <Paper
+              elevation={8}
+              sx={{
+                borderRadius: 3,
+                overflow: 'hidden',
+                border: `1px solid ${theme.palette.divider}`
+              }}
+            >
+              {/* Panel Header */}
+              <Box
+                sx={{
+                  p: 2,
+                  backgroundColor: 'primary.main',
+                  color: 'primary.contrastText',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  {SIDEBAR_ITEMS.find(item => item.id === activeTool)?.label}
+                </Typography>
+                <IconButton
+                  size="small"
+                  onClick={() => setActiveTool(null)}
+                  sx={{ color: 'inherit' }}
+                >
+                  <Remove />
+                </IconButton>
+              </Box>
+
+              {/* Panel Content */}
+              <Box sx={{ p: 3 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Tool options and settings will appear here for: {activeTool}
+                </Typography>
+                
+                {/* Placeholder content for each tool */}
+                <Box sx={{ mt: 2 }}>
+                  {activeTool === 'text' && (
+                    <Box>
+                      <Typography variant="subtitle2" sx={{ mb: 1 }}>Text Options</Typography>
+                      <Chip label="Font Family" size="small" sx={{ mr: 1, mb: 1 }} />
+                      <Chip label="Size" size="small" sx={{ mr: 1, mb: 1 }} />
+                      <Chip label="Color" size="small" sx={{ mr: 1, mb: 1 }} />
+                    </Box>
+                  )}
+                  
+                  {activeTool === 'graphics' && (
+                    <Box>
+                      <Typography variant="subtitle2" sx={{ mb: 1 }}>Graphics</Typography>
+                      <Chip label="Upload Image" size="small" sx={{ mr: 1, mb: 1 }} />
+                      <Chip label="Stock Photos" size="small" sx={{ mr: 1, mb: 1 }} />
+                    </Box>
+                  )}
+                  
+                  {activeTool === 'templates' && (
+                    <Box>
+                      <Typography variant="subtitle2" sx={{ mb: 1 }}>Templates</Typography>
+                      <Chip label="Business" size="small" sx={{ mr: 1, mb: 1 }} />
+                      <Chip label="Creative" size="small" sx={{ mr: 1, mb: 1 }} />
+                      <Chip label="Holiday" size="small" sx={{ mr: 1, mb: 1 }} />
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+            </Paper>
+          </Box>
+        </Slide>
+      )}
     </>
   );
 };
