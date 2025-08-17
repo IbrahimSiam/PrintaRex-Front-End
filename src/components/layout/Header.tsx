@@ -6,30 +6,22 @@ import {
   Button,
   Box,
   IconButton,
-  Badge,
   Menu,
   MenuItem,
   Tooltip,
 } from '@mui/material';
 import {
   Language,
-  ShoppingCart,
-  AccountCircle,
   Menu as MenuIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../../stores/uiStore';
-import { useCartStore } from '../../stores/cartStore';
 import { useI18n } from '../../hooks/useI18n';
-import CurrencySwitcher from '../common/CurrencySwitcher';
-import CountryBadge from '../common/CountryBadge';
-import CartDrawer from '../cart/CartDrawer';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const { t, isRTL } = useI18n();
   const { language, toggleLanguage } = useUIStore();
-  const { isOpen: isCartOpen, toggleCart, getItemCount } = useCartStore();
   
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -90,8 +82,6 @@ const Header: React.FC = () => {
                 {t('header.title')}
               </Typography>
             </Box>
-            
-            <CountryBadge />
           </Box>
 
           {/* Center - Navigation Links */}
@@ -117,10 +107,59 @@ const Header: React.FC = () => {
             >
               {t('header.designer')}
             </Button>
+            <Button 
+              color="inherit" 
+              onClick={() => navigate('/pricing')}
+              sx={{ textTransform: 'none' }}
+            >
+              {t('header.pricing')}
+            </Button>
+            <Button 
+              color="inherit" 
+              onClick={() => navigate('/support')}
+              sx={{ textTransform: 'none' }}
+            >
+              {t('header.support')}
+            </Button>
           </Box>
 
           {/* Right side - Actions */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Login and Sign Up Buttons */}
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => navigate('/login')}
+              sx={{ 
+                textTransform: 'none',
+                fontWeight: 600,
+                borderColor: '#1976d2',
+                color: '#1976d2',
+                '&:hover': {
+                  borderColor: '#1565c0',
+                  backgroundColor: 'rgba(25, 118, 210, 0.04)'
+                }
+              }}
+            >
+              {t('header.login')}
+            </Button>
+            
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate('/signup')}
+              sx={{ 
+                textTransform: 'none',
+                fontWeight: 600,
+                backgroundColor: '#1976d2',
+                '&:hover': {
+                  backgroundColor: '#1565c0'
+                }
+              }}
+            >
+              {t('header.signup')}
+            </Button>
+
             {/* Language Toggle */}
             <Tooltip title={t('common.language')}>
               <IconButton
@@ -139,29 +178,6 @@ const Header: React.FC = () => {
                 <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 600 }}>
                   {language}
                 </Typography>
-              </IconButton>
-            </Tooltip>
-
-            {/* Currency Switcher */}
-            <CurrencySwitcher />
-
-            {/* Cart Icon */}
-            <Tooltip title={t('cart.title')}>
-              <IconButton
-                color="inherit"
-                onClick={toggleCart}
-                sx={{ position: 'relative' }}
-              >
-                <Badge badgeContent={getItemCount()} color="primary">
-                  <ShoppingCart />
-                </Badge>
-              </IconButton>
-            </Tooltip>
-
-            {/* User Account */}
-            <Tooltip title={t('header.account')}>
-              <IconButton color="inherit">
-                <AccountCircle />
               </IconButton>
             </Tooltip>
           </Box>
@@ -193,9 +209,6 @@ const Header: React.FC = () => {
           </Typography>
         </MenuItem>
       </Menu>
-
-      {/* Cart Drawer */}
-      <CartDrawer open={isCartOpen} onClose={() => toggleCart()} />
     </>
   );
 };

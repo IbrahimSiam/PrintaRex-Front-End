@@ -1,21 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Box, Container, Typography, Button, Grid, Chip, Avatar, Badge,
-  ToggleButtonGroup, ToggleButton, FormControl, InputLabel, Select, MenuItem,
+  Box, Container, Typography, Button, Grid, Chip, Badge,
+  FormControl, InputLabel, Select, MenuItem,
   Paper, Rating, Stack, TableContainer, Table, TableBody, TableRow, TableCell,
   Accordion, AccordionSummary, AccordionDetails, Tabs, Tab, ButtonBase,
   useTheme, useMediaQuery, Tooltip, IconButton, TextField, InputAdornment,
   AppBar, Toolbar, Breadcrumbs, Link, Drawer, List, ListItem, ListItemIcon,
-  ListItemText, Divider, Fab
+  ListItemText, Divider, Fab, ToggleButtonGroup, ToggleButton, Avatar
 } from '@mui/material';
 import {
+  ColorSwatches,
+  SizeSelector,
+  ThumbnailRail,
+} from '../components/product/ProductComponents';
+import { ColorSwatches as NewColorSwatches } from '../components/product/ColorSwatches';
+import { MainPicture } from '../components/product/MainPicture';
+import {
   ExpandMore, ShoppingCart, Favorite, FavoriteBorder, Star, StarBorder,
-  LocationOn, LocalShipping, AccessTime, Palette, Print, CheckCircle,
+  LocationOn, LocalShipping, AccessTime, Palette, Print,
   Home, PushPin, PushPinOutlined, Menu, Search, NotificationsNone,
   Settings, ChevronLeft, ChevronRight, ArrowBack, Storefront
 } from '@mui/icons-material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUIStore } from '../stores/uiStore';
+
+// TSHIRT_VARIANTS data model - using actual .webp images for each color
+const TSHIRT_VARIANTS = {
+  black: {
+    key: 'black',
+    name: 'Black',
+    hex: '#25282A',
+    front: '/images/tshirts/black-front.webp',
+    back: '/images/tshirts/black-back.webp',
+    'side-left': '/images/tshirts/black-side-left.webp',
+    'side-right': '/images/tshirts/black-side-right.webp',
+    closeup: '/images/tshirts/black-closeup.webp',
+    lifestyle: '/images/tshirts/black-lifestyle.webp'
+  },
+  white: {
+    key: 'white',
+    name: 'White',
+    hex: '#FFFFFF',
+    front: '/images/tshirts/white-front.webp',
+    back: '/images/tshirts/white-back.webp',
+    'side-left': '/images/tshirts/white-side-left.webp',
+    'side-right': '/images/tshirts/white-side-right.webp',
+    closeup: '/images/tshirts/white-closeup.webp',
+    lifestyle: '/images/tshirts/white-lifestyle.webp'
+  },
+} as const;
+
+// Define all available view types
+type ViewType = 'front' | 'back' | 'side-left' | 'side-right' | 'closeup' | 'lifestyle';
 
 // T-shirt icon component with shared outline and specific print areas
 const TShirtIcon: React.FC<{
@@ -911,16 +947,6 @@ const ShortSleeveTShirt: React.FC = () => {
   const [sidebarPinned, setSidebarPinned] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
-  // Product state
-  const [selectedColor, setSelectedColor] = useState('White');
-  const [selectedSize, setSelectedSize] = useState('M');
-  const [selectedTechnology, setSelectedTechnology] = useState('DTG');
-  const [selectedCountry, setSelectedCountry] = useState('UAE');
-  const [mainImage, setMainImage] = useState('/assets/img/tee.jpg');
-  
-  // Get UI store for currency and shipFrom
-  const { shipFrom } = useUIStore();
-
   // Product data
   const product = {
     id: 1,
@@ -928,16 +954,19 @@ const ShortSleeveTShirt: React.FC = () => {
     code: 'SS-TS-001',
     image: '/assets/img/tee.jpg',
     images: [
-      '/assets/img/tee.jpg',
-      '/assets/img/tee.jpg',
-      '/assets/img/tee.jpg',
-      '/assets/img/tee.jpg'
+      { id: 'front', src: '/assets/img/tee-front.jpg', alt: 'Front view' },
+      { id: 'back', src: '/assets/img/tee-back.jpg', alt: 'Back view' },
+      { id: 'side1', src: '/assets/img/tee-side1.jpg', alt: 'Side view 1' },
+      { id: 'side2', src: '/assets/img/tee-side2.jpg', alt: 'Side view 2' },
     ],
     priceUSD: 24.99,
     priceAED: 91.75,
     priceEGP: 787.69,
     description: 'Classic short sleeve T-shirt with a comfortable fit and premium cotton fabric. Perfect for everyday wear and custom designs.',
-    colors: ['White', 'Black', 'Navy', 'Gray'],
+    colors: [
+      { name: 'White', hex: '#FFFFFF', label: 'White, #FFFFFF' },
+      { name: 'Black', hex: '#25282A', label: 'Black, #25282A' }
+    ],
     sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
     technology: ['DTG', 'DTF'],
     inStock: true,
@@ -955,6 +984,39 @@ const ShortSleeveTShirt: React.FC = () => {
       Egypt: { price: 25.00, currency: 'EGP', days: '5-8' }
     }
   };
+
+  // Product state
+  const [selectedColor, setSelectedColor] = useState<keyof typeof TSHIRT_VARIANTS>('black');
+  const [selectedSize, setSelectedSize] = useState('M');
+  const [selectedTechnology, setSelectedTechnology] = useState('DTG');
+  const [selectedCountry, setSelectedCountry] = useState('UAE');
+  const [selectedView, setSelectedView] = useState<ViewType>('front');
+  
+  // Get UI store for currency and shipFrom
+  const { shipFrom } = useUIStore();
+
+  // Get current color object
+  const activeColor = TSHIRT_VARIANTS[selectedColor];
+
+  // Derive current image sources from actual .webp images
+  const currentSrcWebp = activeColor[selectedView];
+  const currentSrcJpg = currentSrcWebp.replace('.webp', '.jpg'); // Optional jpg fallback
+
+  // Preload the non-visible view on color change to avoid flicker
+  useEffect(() => {
+    const img = new Image();
+    img.src = activeColor[selectedView === 'front' ? 'back' : 'front'];
+  }, [selectedColor, selectedView]);
+
+  // Extended images array for thumbnail navigation with all views
+  const thumbnailImages = [
+    { id: 'front', webp: activeColor.front, jpg: activeColor.front.replace('.webp', '.jpg'), alt: 'Front view' },
+    { id: 'back', webp: activeColor.back, jpg: activeColor.back.replace('.webp', '.jpg'), alt: 'Back view' },
+    { id: 'side-left', webp: activeColor['side-left'], jpg: activeColor['side-left'].replace('.webp', '.jpg'), alt: 'Left side view' },
+    { id: 'side-right', webp: activeColor['side-right'], jpg: activeColor['side-right'].replace('.webp', '.jpg'), alt: 'Right side view' },
+    { id: 'closeup', webp: activeColor.closeup, jpg: activeColor.closeup.replace('.webp', '.jpg'), alt: 'Close-up detail' },
+    { id: 'lifestyle', webp: activeColor.lifestyle, jpg: activeColor.lifestyle.replace('.webp', '.jpg'), alt: 'Lifestyle view' },
+  ];
 
   const handleSidebarToggle = () => setSidebarOpen(!sidebarOpen);
   const handleSidebarPin = () => setSidebarPinned(!sidebarPinned);
@@ -1174,76 +1236,22 @@ const ShortSleeveTShirt: React.FC = () => {
 
           {/* Product Grid */}
           <Grid container spacing={4}>
-            {/* Left: Image Gallery */}
+            {/* Left: Thumbnail Rail */}
             <Grid item xs={12} md={3}>
-              <Box sx={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                gap: 2,
-                position: 'sticky',
-                top: 100
-              }}>
-                                 {product.images.map((image, index) => (
-                   <Box
-                     key={index}
-                     onClick={() => setMainImage(image)}
-                     sx={{
-                       width: '100%',
-                       height: 120,
-                       borderRadius: 3,
-                       overflow: 'hidden',
-                       cursor: 'pointer',
-                       border: mainImage === image ? '3px solid #3b82f6' : '2px solid rgba(226, 232, 240, 0.8)',
-                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                       boxShadow: mainImage === image ? '0 8px 25px rgba(59, 130, 246, 0.25)' : '0 2px 8px rgba(0, 0, 0, 0.06)',
-                       '&:hover': {
-                         borderColor: '#3b82f6',
-                         transform: 'scale(1.03) translateY(-2px)',
-                         boxShadow: '0 12px 30px rgba(59, 130, 246, 0.2)'
-                       }
-                     }}
-                   >
-                    <img
-                      src={image}
-                      alt={`${product.name} view ${index + 1}`}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover'
-                      }}
-                    />
-                  </Box>
-                ))}
-
-
-              </Box>
+              <ThumbnailRail
+                images={thumbnailImages}
+                value={selectedView}
+                onChange={(view) => setSelectedView(view as ViewType)}
+              />
             </Grid>
 
                          {/* Center: Main Image */}
              <Grid item xs={12} md={6}>
-               <Box sx={{ 
-                 width: '100%', 
-                 height: 600, 
-                 borderRadius: 4, 
-                 overflow: 'hidden',
-                 boxShadow: '0 20px 60px rgba(0,0,0,0.12)',
-                 border: '1px solid rgba(226, 232, 240, 0.8)',
-                 transition: 'all 0.3s ease',
-                 '&:hover': {
-                   transform: 'translateY(-4px)',
-                   boxShadow: '0 25px 80px rgba(0,0,0,0.18)'
-                 }
-               }}>
-                <img
-                  src={mainImage}
-                  alt={product.name}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover'
-                  }}
+                <MainPicture
+                  srcWebp={currentSrcWebp}
+                  srcJpg={currentSrcJpg}
+                  alt={`${activeColor.name} T-shirt ${selectedView}`}
                 />
-              </Box>
             </Grid>
 
                                       {/* Right: Product Details */}
@@ -1280,28 +1288,13 @@ const ShortSleeveTShirt: React.FC = () => {
                        </Typography>
                      </Grid>
                      <Grid item xs={8}>
-                       <Stack direction="row" spacing={1} flexWrap="wrap">
-                         {product.colors.map((color) => (
-                           <Avatar
-                             key={color}
-                             onClick={() => setSelectedColor(color)}
-                             sx={{
-                               width: 28,
-                               height: 28,
-                               cursor: 'pointer',
-                               border: selectedColor === color ? '2px solid #3b82f6' : '1px solid #d1d5db',
-                               bgcolor: color.toLowerCase(),
-                               transition: 'all 0.2s ease',
-                               '&:hover': { 
-                                 transform: 'scale(1.1)',
-                                 borderColor: '#3b82f6'
-                               }
-                             }}
-                           >
-                             {selectedColor === color && <CheckCircle sx={{ color: 'white', fontSize: 14 }} />}
-                           </Avatar>
-                         ))}
-                       </Stack>
+                       <NewColorSwatches
+                         value={selectedColor}
+                         onChange={setSelectedColor}
+                         variants={TSHIRT_VARIANTS}
+                       />
+                       
+                       {/* Color information is now only shown on hover via tooltip */}
                      </Grid>
                    </Grid>
                  </Box>
@@ -1311,35 +1304,11 @@ const ShortSleeveTShirt: React.FC = () => {
                    <Typography variant="body2" sx={{ fontWeight: 600, mb: 1.5, color: '#374151' }}>
                      Size
                    </Typography>
-                   <ToggleButtonGroup
+                   <SizeSelector
+                     sizes={product.sizes}
                      value={selectedSize}
-                     exclusive
-                     onChange={(e, newSize) => newSize && setSelectedSize(newSize)}
-                     size="small"
-                     sx={{ width: '100%' }}
-                   >
-                     {product.sizes.map((size) => (
-                       <ToggleButton 
-                         key={size} 
-                         value={size}
-                         sx={{ 
-                           flex: 1,
-                           width: 36,
-                           height: 36,
-                           fontSize: '14px',
-                           border: '1px solid #d1d5db',
-                           '&.Mui-selected': {
-                             backgroundColor: '#3b82f6',
-                             color: 'white',
-                             borderColor: '#3b82f6',
-                             '&:hover': { backgroundColor: '#2563eb' }
-                           }
-                         }}
-                       >
-                         {size}
-                       </ToggleButton>
-                     ))}
-                   </ToggleButtonGroup>
+                     onChange={setSelectedSize}
+                   />
                  </Box>
 
                  {/* Technology Selection */}

@@ -43,7 +43,9 @@
     "contact": "Contact",
     "account": "Account",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "login": "Log In",
+    "signup": "Sign Up"
   },
   "catalog": {
     "title": "Product Catalog",
