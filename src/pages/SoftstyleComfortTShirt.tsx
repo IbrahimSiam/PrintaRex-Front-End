@@ -1,45 +1,325 @@
 import React, { useState } from 'react';
 import {
-  Box, Container, Typography, Grid, Card, CardContent, Button, Chip,
-  useTheme, useMediaQuery, AppBar, Toolbar, IconButton, Breadcrumbs, Link,
-  Avatar, TextField, InputAdornment, Badge, Drawer, List, ListItem,
-  ListItemIcon, ListItemText, Divider, Fab, Tooltip, ToggleButtonGroup,
-  ToggleButton, FormControl, InputLabel, Select, MenuItem, Tabs, Tab,
-  Paper, Rating, Stack
+  Box, Container, Typography, Button, Grid, Chip, Avatar, Badge,
+  ToggleButtonGroup, ToggleButton, FormControl, InputLabel, Select, MenuItem,
+  Paper, Rating, Stack, TableContainer, Table, TableBody, TableRow, TableCell,
+  Accordion, AccordionSummary, AccordionDetails, Tabs, Tab, ButtonBase,
+  useTheme, useMediaQuery, Tooltip, IconButton, TextField, InputAdornment,
+  AppBar, Toolbar, Breadcrumbs, Link, Drawer, List, ListItem, ListItemIcon,
+  ListItemText, Divider, Fab
 } from '@mui/material';
 import {
-  Menu, Search, NotificationsNone, Settings, Home, ChevronLeft,
-  ChevronRight, PushPin, PushPinOutlined, ArrowBack, LocalShipping,
-  CheckCircle, Star, ShoppingCart, Storefront
+  ExpandMore, ShoppingCart, Favorite, FavoriteBorder, Star, StarBorder,
+  LocationOn, LocalShipping, AccessTime, Palette, Print, CheckCircle,
+  Home, PushPin, PushPinOutlined, Menu, Search, NotificationsNone,
+  Settings, ChevronLeft, ChevronRight, ArrowBack, Storefront
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUIStore } from '../stores/uiStore';
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
+// T-shirt icon component with shared outline and specific print areas
+const TShirtIcon: React.FC<{
+  area: string;
+  selected: boolean;
+}> = ({ area, selected }) => {
+  const outlineColor = selected ? '#1976d2' : '#424242'; // primary.main : grey.700
+  const dashColor = selected ? '#1976d2' : '#9e9e9e'; // primary.main : grey.500
+  
+  // Print area coordinates for each position
+  const printAreas = {
+    front: { x: 34, y: 30, w: 28, h: 32 },
+    back: { x: 34, y: 30, w: 28, h: 32 },
+    leftSleeve: { x: 22, y: 28, w: 10, h: 10 },
+    rightSleeve: { x: 64, y: 28, w: 10, h: 10 },
+    innerNeck: { x: 41, y: 22, w: 14, h: 8 },
+    outerNeck: { x: 38, y: 18, w: 20, h: 8 }
+  };
+  
+  const printArea = printAreas[area as keyof typeof printAreas];
+  
+  return (
+    <svg viewBox="0 0 96 96" width="96" height="96">
+      {/* shirt outline */}
+      <path
+        d="M32 18l16-8 16 8 10-6 8 12-10 6v44c0 3.3-2.7 6-6 6H30c-3.3 0-6-2.7-6-6V30l-10-6 8-12 10 6z"
+        fill="none" 
+        stroke={outlineColor} 
+        strokeWidth={2} 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+      {/* collar */}
+      <path 
+        d="M40 20c2.8 2.6 6.2 4 8 4s5.2-1.4 8-4" 
+        fill="none"
+        stroke={outlineColor} 
+        strokeWidth={2} 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+      {/* print area */}
+      <rect
+        x={printArea.x}
+        y={printArea.y}
+        width={printArea.w}
+        height={printArea.h}
+        fill="none"
+        stroke={dashColor}
+        strokeWidth={2}
+        strokeDasharray="4 3"
+        rx={2}
+      />
+    </svg>
+  );
+};
 
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+// Print Areas Accordion Component
+const PrintAreasAccordion: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'DTG' | 'DTF'>('DTG');
+  const [selectedArea, setSelectedArea] = useState<string>('front');
+  
+  const AREAS = [
+    { key: 'front', label: 'Front' },
+    { key: 'back', label: 'Back' },
+    { key: 'leftSleeve', label: 'Left sleeve' },
+    { key: 'rightSleeve', label: 'Right sleeve' },
+    { key: 'innerNeck', label: 'Inner neck' },
+    { key: 'outerNeck', label: 'Outer neck' },
+  ];
+  
+  const TAB_AREAS = { DTG: AREAS, DTF: AREAS };
+  
+  const handleTabChange = (event: React.SyntheticEvent, newValue: 'DTG' | 'DTF') => {
+    if (newValue !== null) {
+      setActiveTab(newValue);
+      setSelectedArea('front'); // Reset selection when switching tabs
+    }
+  };
+  
+  const handleAreaSelect = (areaKey: string) => {
+    setSelectedArea(areaKey);
+  };
+  
+  return (
+    <Accordion
+      defaultExpanded
+      square={false}
+      disableGutters
+      elevation={0}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        mt: 2,
+        '&:before': { display: 'none' }
+      }}
+    >
+      <AccordionSummary
+        expandIcon={
+          <Box
+            sx={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: 'action.hover',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <ExpandMore sx={{ fontSize: 20, color: 'text.secondary' }} />
+          </Box>
+        }
+        sx={{
+          '& .MuiAccordionSummary-content': {
+            margin: 0
+          }
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          Print areas
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ pt: 0, pb: 2 }}>
+        {/* DTG/DTF Tabs */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <Tabs 
+            value={activeTab} 
+            onChange={handleTabChange}
+            aria-label="Print technology tabs"
+            sx={{
+              '& .MuiTab-root': {
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                textTransform: 'none',
+                minHeight: 40,
+                px: 3
+              },
+              '& .MuiTabs-indicator': {
+                height: 2,
+                borderRadius: '1px 1px 0 0'
+              }
+            }}
+          >
+            <Tab 
+              label="DTG" 
+              value="DTG"
+              sx={{ fontSize: '0.875rem' }}
+            />
+            <Tab 
+              label="DTF" 
+              value="DTF"
+              sx={{ fontSize: '0.875rem' }}
+            />
+          </Tabs>
+        </Box>
+        
+        {/* Print Areas Grid */}
+        <Grid container spacing={3} justifyContent="center">
+          {TAB_AREAS[activeTab].map((area) => (
+            <Grid item xs={6} md="auto" key={area.key}>
+              <ButtonBase
+                onClick={() => handleAreaSelect(area.key)}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  p: 1,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: selectedArea === area.key ? 'primary.main' : 'divider',
+                  borderWidth: selectedArea === area.key ? 2 : 1,
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    borderColor: 'text.primary',
+                    boxShadow: 2,
+                    '& .tshirt-icon': {
+                      color: 'text.primary'
+                    }
+                  },
+                  '&:focus-visible': {
+                    outline: '2px solid',
+                    outlineColor: 'primary.main',
+                    outlineOffset: 2
+                  }
+                }}
+                role="button"
+                aria-label={`${area.label} print area`}
+                aria-pressed={selectedArea === area.key}
+              >
+                <Box sx={{ mb: 1 }}>
+                  <TShirtIcon 
+                    area={area.key} 
+                    selected={selectedArea === area.key}
+                  />
+                </Box>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: selectedArea === area.key ? 'text.primary' : 'text.secondary',
+                    fontWeight: selectedArea === area.key ? 600 : 500
+                  }}
+                >
+                  {area.label}
+                </Typography>
+              </ButtonBase>
+            </Grid>
+          ))}
+        </Grid>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+
+// Size Guide Accordion Component
+const SizeGuideAccordion: React.FC = () => {
+  const sizeChartData = [
+    { size: 'S', chest: '34-36', length: '27' },
+    { size: 'M', chest: '38-40', length: '28' },
+    { size: 'L', chest: '42-44', length: '29' },
+    { size: 'XL', chest: '46-48', length: '30' },
+    { size: '2XL', chest: '50-52', length: '31' },
+    { size: '3XL', chest: '54-56', length: '32' }
+  ];
 
   return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
+    <Accordion
+      square={false}
+      disableGutters
+      elevation={0}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        mt: 2,
+        '&:before': { display: 'none' }
+      }}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
+      <AccordionSummary
+        expandIcon={
+          <Box
+            sx={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: 'action.hover',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <ExpandMore sx={{ fontSize: 20, color: 'text.secondary' }} />
+          </Box>
+        }
+        sx={{
+          '& .MuiAccordionSummary-content': {
+            margin: 0
+          }
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          Size guide
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ pt: 0, pb: 2 }}>
+        <Box sx={{ overflowX: 'auto' }}>
+          <TableContainer>
+            <Table size="small">
+              <TableBody>
+                <TableRow>
+                  <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                    Size
+                  </TableCell>
+                  <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                    Chest (in)
+                  </TableCell>
+                  <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                    Length (in)
+                  </TableCell>
+                </TableRow>
+                {sizeChartData.map((row) => (
+                  <TableRow key={row.size}>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      {row.size}
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      {row.chest}
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      {row.length}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
-      )}
-    </div>
+      </AccordionDetails>
+    </Accordion>
   );
-}
+};
+
 
 // Fulfillment Providers Section Component
 const FulfillmentProvidersSection: React.FC = () => {
@@ -203,7 +483,7 @@ const FulfillmentProvidersSection: React.FC = () => {
         <Grid container spacing={3}>
           {sortedProviders.map((provider) => (
             <Grid item xs={12} key={provider.id}>
-              <Card
+              <Paper
                 sx={{
                   borderRadius: 3,
                   border: selectedProvider === provider.id ? '2px solid #667eea' : '1px solid #e5e7eb',
@@ -217,7 +497,7 @@ const FulfillmentProvidersSection: React.FC = () => {
                 }}
                 onClick={() => setSelectedProvider(provider.id)}
               >
-                <CardContent sx={{ p: 3 }}>
+                <Box sx={{ p: 3 }}>
                   <Grid container spacing={3} alignItems="center">
                     {/* Left: Provider Info */}
                     <Grid item xs={12} md={8}>
@@ -364,8 +644,8 @@ const FulfillmentProvidersSection: React.FC = () => {
                       </Box>
                     </Grid>
                   </Grid>
-                </CardContent>
-              </Card>
+                </Box>
+              </Paper>
             </Grid>
           ))}
         </Grid>
@@ -374,7 +654,254 @@ const FulfillmentProvidersSection: React.FC = () => {
   );
 };
 
-const SoftstyleComfortTShirt: React.FC = () => {
+// Product Details Accordion Component
+const ProductDetailsAccordion: React.FC = () => {
+  return (
+    <Accordion
+      defaultExpanded
+      square={false}
+      disableGutters
+      elevation={0}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        mt: 2,
+        '&:before': { display: 'none' }
+      }}
+    >
+      <AccordionSummary
+        expandIcon={
+          <Box
+            sx={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: 'action.hover',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <ExpandMore sx={{ fontSize: 20, color: 'text.secondary' }} />
+          </Box>
+        }
+        sx={{
+          '& .MuiAccordionSummary-content': {
+            margin: 0
+          }
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          Product Details
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ pt: 0, pb: 2 }}>
+        <Grid container spacing={4} sx={{ maxWidth: 1000 }}>
+          {/* Specifications */}
+          <Grid item xs={12} md={6}>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: 'text.primary' }}>
+              Specifications
+            </Typography>
+            <TableContainer>
+              <Table size="small">
+                <TableBody>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Material
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      100% Premium Cotton
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Weight
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      180 GSM
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Fit
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      Regular Fit
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Style
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      Classic Crew Neck
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+
+          {/* Available Options */}
+          <Grid item xs={12} md={6}>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: 'text.primary' }}>
+              Available Options
+            </Typography>
+            <TableContainer>
+              <Table size="small">
+                <TableBody>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Colors
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      4 options
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Sizes
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      6 options
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, fontWeight: 600, color: 'text.secondary' }}>
+                      Technology
+                    </TableCell>
+                    <TableCell sx={{ border: 'none', py: 1, px: 0, color: 'text.primary' }}>
+                      2 options
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+        </Grid>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+// Fulfillment Options Accordion Component
+const FulfillmentOptionsAccordion: React.FC = () => {
+  return (
+    <Accordion
+      defaultExpanded
+      square={false}
+      disableGutters
+      elevation={0}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        mt: 2,
+        '&:before': { display: 'none' }
+      }}
+    >
+      <AccordionSummary
+        expandIcon={
+          <Box
+            sx={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: 'action.hover',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <ExpandMore sx={{ fontSize: 20, color: 'text.secondary' }} />
+          </Box>
+        }
+        sx={{
+          '& .MuiAccordionSummary-content': {
+            margin: 0
+          }
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          Fulfillment Options
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ pt: 0, pb: 2 }}>
+        <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3, maxWidth: 600 }}>
+          Choose from our network of trusted fulfillment providers. Each provider offers different pricing, production times, and shipping options to meet your specific needs.
+        </Typography>
+        <FulfillmentProvidersSection />
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+// Customer Reviews Accordion Component
+const CustomerReviewsAccordion: React.FC = () => {
+  return (
+    <Accordion
+      defaultExpanded
+      square={false}
+      disableGutters
+      elevation={0}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        mt: 2,
+        '&:before': { display: 'none' }
+      }}
+    >
+      <AccordionSummary
+        expandIcon={
+          <Box
+            sx={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: 'action.hover',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <ExpandMore sx={{ fontSize: 20, color: 'text.secondary' }} />
+          </Box>
+        }
+        sx={{
+          '& .MuiAccordionSummary-content': {
+            margin: 0
+          }
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          Customer Reviews
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ pt: 0, pb: 2 }}>
+        <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4, maxWidth: 500 }}>
+          No reviews yet for this product. Be the first to share your experience and help other customers make informed decisions.
+        </Typography>
+        <Button
+          variant="contained"
+          size="large"
+          sx={{
+            px: 4,
+            py: 1.5,
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 600
+          }}
+        >
+          Write a Review
+        </Button>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+const ShortSleeveTShirt: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
@@ -389,17 +916,16 @@ const SoftstyleComfortTShirt: React.FC = () => {
   const [selectedSize, setSelectedSize] = useState('M');
   const [selectedTechnology, setSelectedTechnology] = useState('DTG');
   const [selectedCountry, setSelectedCountry] = useState('UAE');
-  const [tabValue, setTabValue] = useState(0);
   const [mainImage, setMainImage] = useState('/assets/img/tee.jpg');
   
   // Get UI store for currency and shipFrom
-  const { shipFrom, setShipFrom, setCurrency } = useUIStore();
+  const { shipFrom } = useUIStore();
 
   // Product data
   const product = {
-    id: 4,
-    name: 'Softstyle Comfort T-Shirt',
-    code: 'SC-TS-004',
+    id: 1,
+    name: 'Short Sleeve T-Shirt',
+    code: 'SS-TS-001',
     image: '/assets/img/tee.jpg',
     images: [
       '/assets/img/tee.jpg',
@@ -407,22 +933,22 @@ const SoftstyleComfortTShirt: React.FC = () => {
       '/assets/img/tee.jpg',
       '/assets/img/tee.jpg'
     ],
-    priceUSD: 27.99,
-    priceAED: 102.75,
-    priceEGP: 882.19,
-    description: 'Ultra-soft comfort T-shirt with a relaxed fit and premium fabric blend. Designed for maximum comfort and everyday wear.',
-    colors: ['White', 'Black', 'Gray', 'Blue'],
+    priceUSD: 24.99,
+    priceAED: 91.75,
+    priceEGP: 787.69,
+    description: 'Classic short sleeve T-shirt with a comfortable fit and premium cotton fabric. Perfect for everyday wear and custom designs.',
+    colors: ['White', 'Black', 'Navy', 'Gray'],
     sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
     technology: ['DTG', 'DTF'],
     inStock: true,
-    tags: ['softstyle', 'comfort', 'premium'],
+    tags: ['classic', 'comfortable', 'versatile'],
     features: [
-      'Ultra-soft fabric blend',
-      'Relaxed comfort fit',
-      'Premium cotton blend',
-      'Breathable material',
-      'Everyday comfort',
-      'Easy to customize'
+      '100% Premium Cotton',
+      'Comfortable fit',
+      'Breathable fabric',
+      'Easy to customize',
+      'Multiple color options',
+      'Various size availability'
     ],
     shipping: {
       UAE: { price: 15.00, currency: 'AED', days: '3-5' },
@@ -433,7 +959,6 @@ const SoftstyleComfortTShirt: React.FC = () => {
   const handleSidebarToggle = () => setSidebarOpen(!sidebarOpen);
   const handleSidebarPin = () => setSidebarPinned(!sidebarPinned);
   const handleSidebarCollapse = () => setSidebarCollapsed(!sidebarCollapsed);
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => setTabValue(newValue);
 
   const getSidebarWidth = () => {
     if (sidebarCollapsed) return 64;
@@ -504,10 +1029,20 @@ const SoftstyleComfortTShirt: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#fafafa' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
       {/* Desktop Sidebar */}
       {!isMobile && sidebarOpen && (
-        <Box sx={{ width: getSidebarWidth(), backgroundColor: 'white', borderRight: '1px solid #e5e7eb', position: 'fixed', height: '100vh', zIndex: 1000, transition: 'width 0.3s ease-in-out', overflow: 'hidden' }}>
+        <Box sx={{ 
+          width: getSidebarWidth(), 
+          background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)', 
+          borderRight: '1px solid rgba(226, 232, 240, 0.8)', 
+          position: 'fixed', 
+          height: '100vh', 
+          zIndex: 1000, 
+          transition: 'width 0.3s ease-in-out', 
+          overflow: 'hidden',
+          boxShadow: '2px 0 20px rgba(0, 0, 0, 0.05)'
+        }}>
           <SidebarContent />
         </Box>
       )}
@@ -520,8 +1055,14 @@ const SoftstyleComfortTShirt: React.FC = () => {
       {/* Main Content */}
       <Box sx={{ flex: 1, ml: { xs: 0, md: sidebarOpen ? `${getSidebarWidth()}px` : 0 }, transition: 'margin-left 0.3s ease-in-out' }}>
         {/* Top Bar */}
-        <AppBar position="sticky" sx={{ backgroundColor: 'white', color: 'text.primary', borderBottom: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <AppBar position="sticky" sx={{ 
+          background: 'rgba(255, 255, 255, 0.95)', 
+          backdropFilter: 'blur(20px)',
+          color: 'text.primary', 
+          borderBottom: '1px solid rgba(226, 232, 240, 0.6)', 
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+        }}>
+          <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <IconButton edge="start" onClick={handleSidebarToggle} sx={{ mr: 1 }}><Menu /></IconButton>
               <IconButton onClick={() => navigate('/app/t-shirts')} sx={{ mr: 1 }}><ArrowBack /></IconButton>
@@ -540,9 +1081,25 @@ const SoftstyleComfortTShirt: React.FC = () => {
                 variant="outlined" 
                 size="small" 
                 InputProps={{ 
-                  startAdornment: <InputAdornment position="start"><Search sx={{ color: 'text.secondary' }} /></InputAdornment> 
+                  startAdornment: <InputAdornment position="start"><Search sx={{ color: '#64748b' }} /></InputAdornment> 
                 }} 
-                sx={{ '& .MuiOutlinedInput-root': { backgroundColor: '#f8f9fa', borderRadius: 2 } }} 
+                sx={{ 
+                  '& .MuiOutlinedInput-root': { 
+                    backgroundColor: 'rgba(248, 250, 252, 0.8)', 
+                    borderRadius: 3,
+                    border: '1px solid rgba(226, 232, 240, 0.6)',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      backgroundColor: 'rgba(248, 250, 252, 1)',
+                      borderColor: 'rgba(148, 163, 184, 0.8)'
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'white',
+                      borderColor: '#3b82f6',
+                      boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)'
+                    }
+                  } 
+                }} 
               />
             </Box>
 
@@ -557,36 +1114,95 @@ const SoftstyleComfortTShirt: React.FC = () => {
         {/* Main Content */}
         <Container maxWidth="xl" sx={{ py: 6 }}>
           {/* Breadcrumbs */}
-          <Breadcrumbs sx={{ mb: 4, '& .MuiBreadcrumbs-ol': { alignItems: 'center' } }}>
-            <Link component="button" variant="body2" onClick={() => navigate('/')} sx={{ textDecoration: 'none', color: '#6b7280', fontWeight: 500, '&:hover': { color: '#6366f1' } }}>Home</Link>
-            <Link component="button" variant="body2" onClick={() => navigate('/app/catalog')} sx={{ textDecoration: 'none', color: '#6b7280', fontWeight: 500, '&:hover': { color: '#6366f1' } }}>Catalog</Link>
-            <Link component="button" variant="body2" onClick={() => navigate('/app/t-shirts')} sx={{ textDecoration: 'none', color: '#6b7280', fontWeight: 500, '&:hover': { color: '#6366f1' } }}>T-Shirts</Link>
-            <Typography variant="body2" color="text.primary" sx={{ fontWeight: 500 }}>{product.name}</Typography>
+          <Breadcrumbs sx={{ 
+            mb: 4, 
+            '& .MuiBreadcrumbs-ol': { alignItems: 'center' },
+            '& .MuiBreadcrumbs-separator': { color: '#94a3b8' }
+          }}>
+            <Link component="button" variant="body2" onClick={() => navigate('/')} sx={{ 
+              textDecoration: 'none', 
+              color: '#64748b', 
+              fontWeight: 500, 
+              px: 2,
+              py: 1,
+              borderRadius: 2,
+              transition: 'all 0.2s ease',
+              '&:hover': { 
+                color: '#3b82f6', 
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                transform: 'translateY(-1px)'
+              } 
+            }}>Home</Link>
+            <Link component="button" variant="body2" onClick={() => navigate('/app/catalog')} sx={{ 
+              textDecoration: 'none', 
+              color: '#64748b', 
+              fontWeight: 500, 
+              px: 2,
+              py: 1,
+              borderRadius: 2,
+              transition: 'all 0.2s ease',
+              '&:hover': { 
+                color: '#3b82f6', 
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                transform: 'translateY(-1px)'
+              } 
+            }}>Catalog</Link>
+            <Link component="button" variant="body2" onClick={() => navigate('/app/t-shirts')} sx={{ 
+              textDecoration: 'none', 
+              color: '#64748b', 
+              fontWeight: 500, 
+              px: 2,
+              py: 1,
+              borderRadius: 2,
+              transition: 'all 0.2s ease',
+              '&:hover': { 
+                color: '#3b82f6', 
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                transform: 'translateY(-1px)'
+              } 
+            }}>T-Shirts</Link>
+            <Typography variant="body2" color="text.primary" sx={{ 
+              fontWeight: 600, 
+              color: '#1e293b',
+              px: 2,
+              py: 1,
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderRadius: 2,
+              border: '1px solid rgba(59, 130, 246, 0.2)'
+            }}>{product.name}</Typography>
           </Breadcrumbs>
 
           {/* Product Grid */}
           <Grid container spacing={4}>
             {/* Left: Image Gallery */}
             <Grid item xs={12} md={3}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {product.images.map((image, index) => (
-                  <Box
-                    key={index}
-                    onClick={() => setMainImage(image)}
-                    sx={{
-                      width: '100%',
-                      height: 120,
-                      borderRadius: 2,
-                      overflow: 'hidden',
-                      cursor: 'pointer',
-                      border: mainImage === image ? '3px solid #1976d2' : '2px solid #e5e7eb',
-                      transition: 'all 0.2s ease-in-out',
-                      '&:hover': {
-                        borderColor: '#1976d2',
-                        transform: 'scale(1.02)'
-                      }
-                    }}
-                  >
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: 2,
+                position: 'sticky',
+                top: 100
+              }}>
+                                 {product.images.map((image, index) => (
+                   <Box
+                     key={index}
+                     onClick={() => setMainImage(image)}
+                     sx={{
+                       width: '100%',
+                       height: 120,
+                       borderRadius: 3,
+                       overflow: 'hidden',
+                       cursor: 'pointer',
+                       border: mainImage === image ? '3px solid #3b82f6' : '2px solid rgba(226, 232, 240, 0.8)',
+                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                       boxShadow: mainImage === image ? '0 8px 25px rgba(59, 130, 246, 0.25)' : '0 2px 8px rgba(0, 0, 0, 0.06)',
+                       '&:hover': {
+                         borderColor: '#3b82f6',
+                         transform: 'scale(1.03) translateY(-2px)',
+                         boxShadow: '0 12px 30px rgba(59, 130, 246, 0.2)'
+                       }
+                     }}
+                   >
                     <img
                       src={image}
                       alt={`${product.name} view ${index + 1}`}
@@ -598,19 +1214,26 @@ const SoftstyleComfortTShirt: React.FC = () => {
                     />
                   </Box>
                 ))}
+
+
               </Box>
             </Grid>
 
-            {/* Center: Main Image */}
-            <Grid item xs={12} md={6}>
-              <Box sx={{ 
-                width: '100%', 
-                height: 600, 
-                borderRadius: 3, 
-                overflow: 'hidden',
-                boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-                border: '1px solid #f3f4f6'
-              }}>
+                         {/* Center: Main Image */}
+             <Grid item xs={12} md={6}>
+               <Box sx={{ 
+                 width: '100%', 
+                 height: 600, 
+                 borderRadius: 4, 
+                 overflow: 'hidden',
+                 boxShadow: '0 20px 60px rgba(0,0,0,0.12)',
+                 border: '1px solid rgba(226, 232, 240, 0.8)',
+                 transition: 'all 0.3s ease',
+                 '&:hover': {
+                   transform: 'translateY(-4px)',
+                   boxShadow: '0 25px 80px rgba(0,0,0,0.18)'
+                 }
+               }}>
                 <img
                   src={mainImage}
                   alt={product.name}
@@ -623,308 +1246,308 @@ const SoftstyleComfortTShirt: React.FC = () => {
               </Box>
             </Grid>
 
-            {/* Right: Product Details */}
-            <Grid item xs={12} md={3}>
-              <Box sx={{ 
-                position: 'sticky', 
-                top: 100, 
-                backgroundColor: 'white', 
-                borderRadius: 3, 
-                p: 3,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                border: '1px solid #f3f4f6'
-              }}>
-                {/* Product Title */}
-                <Typography variant="h4" component="h1" sx={{ fontWeight: 700, mb: 1, color: '#1f2937' }}>
-                  {product.name}
-                </Typography>
-                
-                {/* Product Code */}
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontFamily: 'monospace' }}>
-                  Product Code: {product.code}
-                </Typography>
+                                      {/* Right: Product Details */}
+             <Grid item xs={12} md={3}>
+               <Paper sx={{ 
+                 position: 'sticky', 
+                 top: 100, 
+                 p: 2,
+                 borderRadius: 2,
+                 boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                 border: '1px solid #e5e7eb'
+               }}>
+                 {/* Product Title */}
+                 <Typography variant="h5" component="h1" sx={{ fontWeight: 600, mb: 1, color: '#1f2937' }}>
+                   {product.name}
+                 </Typography>
+                 
+                 {/* Product Code */}
+                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                   {product.code}
+                 </Typography>
 
-                {/* Price */}
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="h3" color="primary" sx={{ fontWeight: 800, color: '#1976d2' }}>
-                    {getCurrentCurrency()} {getCurrentPrice().toFixed(2)}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Base product price
-                  </Typography>
-                </Box>
+                 {/* Base Product Price */}
+                 <Typography variant="body1" sx={{ mb: 3, color: '#374151', fontWeight: 500 }}>
+                   Base product price: {getCurrentCurrency()} {getCurrentPrice().toFixed(2)}
+                 </Typography>
 
-                {/* Color Selection */}
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#374151' }}>
-                    Color
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    {product.colors.map((color) => (
-                      <Avatar
-                        key={color}
-                        onClick={() => setSelectedColor(color)}
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          cursor: 'pointer',
-                          border: selectedColor === color ? '3px solid #1976d2' : '2px solid #e5e7eb',
-                          bgcolor: color.toLowerCase(),
-                          '&:hover': { transform: 'scale(1.1)' },
-                          transition: 'all 0.2s ease-in-out'
-                        }}
-                      >
-                        {selectedColor === color && <CheckCircle sx={{ color: 'white', fontSize: 20 }} />}
-                      </Avatar>
-                    ))}
-                  </Box>
-                </Box>
+                 {/* Color Selection */}
+                 <Box sx={{ mb: 3 }}>
+                   <Grid container alignItems="center" spacing={2}>
+                     <Grid item xs={4}>
+                       <Typography variant="body2" sx={{ fontWeight: 600, color: '#374151' }}>
+                         Color:
+                       </Typography>
+                     </Grid>
+                     <Grid item xs={8}>
+                       <Stack direction="row" spacing={1} flexWrap="wrap">
+                         {product.colors.map((color) => (
+                           <Avatar
+                             key={color}
+                             onClick={() => setSelectedColor(color)}
+                             sx={{
+                               width: 28,
+                               height: 28,
+                               cursor: 'pointer',
+                               border: selectedColor === color ? '2px solid #3b82f6' : '1px solid #d1d5db',
+                               bgcolor: color.toLowerCase(),
+                               transition: 'all 0.2s ease',
+                               '&:hover': { 
+                                 transform: 'scale(1.1)',
+                                 borderColor: '#3b82f6'
+                               }
+                             }}
+                           >
+                             {selectedColor === color && <CheckCircle sx={{ color: 'white', fontSize: 14 }} />}
+                           </Avatar>
+                         ))}
+                       </Stack>
+                     </Grid>
+                   </Grid>
+                 </Box>
 
-                {/* Size Selection */}
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#374151' }}>
-                    Size
-                  </Typography>
-                  <ToggleButtonGroup
-                    value={selectedSize}
-                    exclusive
-                    onChange={(e, newSize) => newSize && setSelectedSize(newSize)}
-                    sx={{ width: '100%' }}
-                  >
-                    {product.sizes.map((size) => (
-                      <ToggleButton 
-                        key={size} 
-                        value={size}
-                        sx={{ 
-                          flex: 1,
-                          border: '1px solid #e5e7eb',
-                          '&.Mui-selected': {
-                            backgroundColor: '#1976d2',
-                            color: 'white',
-                            '&:hover': { backgroundColor: '#1565c0' }
-                          }
-                        }}
-                      >
-                        {size}
-                      </ToggleButton>
-                    ))}
-                  </ToggleButtonGroup>
-                </Box>
+                 {/* Size Selection */}
+                 <Box sx={{ mb: 3 }}>
+                   <Typography variant="body2" sx={{ fontWeight: 600, mb: 1.5, color: '#374151' }}>
+                     Size
+                   </Typography>
+                   <ToggleButtonGroup
+                     value={selectedSize}
+                     exclusive
+                     onChange={(e, newSize) => newSize && setSelectedSize(newSize)}
+                     size="small"
+                     sx={{ width: '100%' }}
+                   >
+                     {product.sizes.map((size) => (
+                       <ToggleButton 
+                         key={size} 
+                         value={size}
+                         sx={{ 
+                           flex: 1,
+                           width: 36,
+                           height: 36,
+                           fontSize: '14px',
+                           border: '1px solid #d1d5db',
+                           '&.Mui-selected': {
+                             backgroundColor: '#3b82f6',
+                             color: 'white',
+                             borderColor: '#3b82f6',
+                             '&:hover': { backgroundColor: '#2563eb' }
+                           }
+                         }}
+                       >
+                         {size}
+                       </ToggleButton>
+                     ))}
+                   </ToggleButtonGroup>
+                 </Box>
 
-                {/* Technology Selection */}
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#374151' }}>
-                    Printing Technology
-                  </Typography>
-                  <ToggleButtonGroup
-                    value={selectedTechnology}
-                    exclusive
-                    onChange={(e, newTech) => newTech && setSelectedTechnology(newTech)}
-                    sx={{ width: '100%' }}
-                  >
-                    {product.technology.map((tech) => (
-                      <ToggleButton 
-                        key={tech} 
-                        value={tech}
-                        sx={{ 
-                          flex: 1,
-                          border: '1px solid #e5e7eb',
-                          '&.Mui-selected': {
-                            backgroundColor: '#1976d2',
-                            color: 'white',
-                            '&:hover': { backgroundColor: '#1565c0' }
-                          }
-                        }}
-                      >
-                        {tech}
-                      </ToggleButton>
-                    ))}
-                  </ToggleButtonGroup>
-                </Box>
+                 {/* Technology Selection */}
+                 <Box sx={{ mb: 3 }}>
+                   <Grid container alignItems="center" spacing={2}>
+                     <Grid item xs={5}>
+                       <Typography variant="body2" sx={{ fontWeight: 600, color: '#374151' }}>
+                         Printing Technology:
+                       </Typography>
+                     </Grid>
+                     <Grid item xs={7}>
+                       <ToggleButtonGroup
+                         value={selectedTechnology}
+                         exclusive
+                         onChange={(e, newTech) => newTech && setSelectedTechnology(newTech)}
+                         size="small"
+                         sx={{ width: '100%' }}
+                       >
+                         {product.technology.map((tech) => (
+                           <ToggleButton 
+                             key={tech} 
+                             value={tech}
+                             sx={{ 
+                               flex: 1,
+                               fontSize: '12px',
+                               py: 0.5,
+                               px: 1,
+                               border: '1px solid #d1d5db',
+                               '&.Mui-selected': {
+                                 backgroundColor: '#3b82f6',
+                                 color: 'white',
+                                 borderColor: '#3b82f6',
+                                 '&:hover': { backgroundColor: '#2563eb' }
+                               }
+                             }}
+                           >
+                             {tech}
+                           </ToggleButton>
+                         ))}
+                       </ToggleButtonGroup>
+                     </Grid>
+                   </Grid>
+                 </Box>
 
-                {/* Shipping Country */}
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#374151' }}>
-                    Ships from
-                  </Typography>
-                  <FormControl fullWidth>
-                    <Select
-                      value={selectedCountry}
-                      onChange={(e) => setSelectedCountry(e.target.value)}
-                      sx={{ borderRadius: 2 }}
-                    >
-                      <MenuItem value="UAE">🇦🇪 UAE</MenuItem>
-                      <MenuItem value="Egypt">🇪🇬 Egypt</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
+                 {/* Shipping Country */}
+                 <Box sx={{ mb: 3 }}>
+                   <Grid container alignItems="center" spacing={2}>
+                     <Grid item xs={4}>
+                       <Typography variant="body2" sx={{ fontWeight: 600, color: '#374151' }}>
+                         Ships from:
+                       </Typography>
+                     </Grid>
+                     <Grid item xs={8}>
+                       <FormControl size="small" sx={{ width: '100%' }}>
+                         <Select
+                           value={selectedCountry}
+                           onChange={(e) => setSelectedCountry(e.target.value)}
+                           sx={{ fontSize: '14px' }}
+                         >
+                           <MenuItem value="UAE">🇦🇪 UAE</MenuItem>
+                           <MenuItem value="Egypt">🇪🇬 Egypt</MenuItem>
+                         </Select>
+                       </FormControl>
+                     </Grid>
+                   </Grid>
+                 </Box>
 
-                {/* Shipping Info */}
-                <Box sx={{ mb: 3, p: 2, backgroundColor: '#f8f9fa', borderRadius: 2, border: '1px solid #e5e7eb' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <LocalShipping sx={{ color: '#6b7280', fontSize: 20 }} />
-                    <Typography variant="body2" color="text.secondary">
-                      Shipping: {getCurrentCurrency()} {getShippingPrice().toFixed(2)}
-                    </Typography>
-                  </Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Ships in {product.shipping[selectedCountry as keyof typeof product.shipping]?.days} business days
-                  </Typography>
-                </Box>
+                 {/* Shipping Info */}
+                 <Box sx={{ mb: 3, p: 1.5, backgroundColor: '#f9fafb', borderRadius: 1.5, border: '1px solid #e5e7eb' }}>
+                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                     <LocalShipping sx={{ color: '#6b7280', fontSize: 16 }} />
+                     <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                       Shipping: {getCurrentCurrency()} {getShippingPrice().toFixed(2)}
+                     </Typography>
+                   </Box>
+                   <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                     Ships in {product.shipping[selectedCountry as keyof typeof product.shipping]?.days} business days
+                   </Typography>
+                 </Box>
 
-                {/* Total Price */}
-                <Box sx={{ mb: 3, p: 2, backgroundColor: '#f0f9ff', borderRadius: 2, border: '1px solid #0ea5e9' }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#0c4a6e' }}>
-                    Total: {getCurrentCurrency()} {(getCurrentPrice() + getShippingPrice()).toFixed(2)}
-                  </Typography>
-                </Box>
+                 {/* Total Price */}
+                 <Box sx={{ mb: 3, p: 1.5, backgroundColor: '#eff6ff', borderRadius: 1.5, border: '1px solid #bfdbfe' }}>
+                   <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1e40af' }}>
+                     Total: {getCurrentCurrency()} {(getCurrentPrice() + getShippingPrice()).toFixed(2)}
+                   </Typography>
+                 </Box>
 
-                {/* Action Buttons */}
-                <Stack spacing={2}>
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    size="large"
-                    startIcon={<Storefront />}
-                    sx={{
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      py: 1.5,
-                      backgroundColor: '#1976d2',
-                      '&:hover': { backgroundColor: '#1565c0' }
-                    }}
-                  >
-                    Add to Store
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    size="large"
-                    startIcon={<ShoppingCart />}
-                    sx={{
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      py: 1.5,
-                      borderColor: '#1976d2',
-                      color: '#1976d2',
-                      '&:hover': { borderColor: '#1565c0', backgroundColor: 'rgba(25, 118, 210, 0.04)' }
-                    }}
-                  >
-                    Create Order
-                  </Button>
-                </Stack>
+                 {/* Action Buttons */}
+                 <Stack spacing={2}>
+                   <Button
+                     variant="contained"
+                     fullWidth
+                     size="medium"
+                     startIcon={<Storefront />}
+                     sx={{
+                       borderRadius: 2,
+                       textTransform: 'none',
+                       fontWeight: 600,
+                       py: 1.5,
+                       backgroundColor: '#10b981',
+                       '&:hover': { 
+                         backgroundColor: '#059669',
+                         transform: 'translateY(-1px)'
+                       }
+                     }}
+                   >
+                     Add to Store
+                   </Button>
+                   <Button
+                     variant="outlined"
+                     fullWidth
+                     size="medium"
+                     startIcon={<ShoppingCart />}
+                     sx={{
+                       borderRadius: 2,
+                       textTransform: 'none',
+                       fontWeight: 600,
+                       py: 1.5,
+                       borderColor: '#3b82f6',
+                       color: '#3b82f6',
+                       '&:hover': { 
+                         borderColor: '#2563eb', 
+                         backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                         transform: 'translateY(-1px)'
+                       }
+                     }}
+                   >
+                     Create Order
+                   </Button>
+                 </Stack>
 
-                {/* Fulfillment Info */}
-                <Box sx={{ mt: 3, p: 2, backgroundColor: '#f0fdf4', borderRadius: 2, border: '1px solid #22c55e' }}>
-                  <Typography variant="body2" sx={{ color: '#166534', fontWeight: 500 }}>
-                    ✓ Ships in 8–12 business days
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#166534' }}>
-                    ✓ Fulfilled in 14 countries
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
+                 {/* Fulfillment Info */}
+                 <Box sx={{ 
+                   mt: 3, 
+                   p: 1.5, 
+                   backgroundColor: '#f0fdf4', 
+                   borderRadius: 1.5, 
+                   border: '1px solid #bbf7d0'
+                 }}>
+                   <Typography variant="body2" sx={{ color: '#166534', fontWeight: 500, fontSize: '0.875rem', mb: 0.5 }}>
+                     ✓ Ships in 8–12 business days
+                   </Typography>
+                   <Typography variant="body2" sx={{ color: '#16a34a', fontSize: '0.875rem' }}>
+                     ✓ Fulfilled in 14 countries
+                   </Typography>
+                 </Box>
+               </Paper>
+             </Grid>
           </Grid>
 
-          {/* Product Tabs */}
+          {/* Info Sections - Full Width Below Main Grid */}
           <Box sx={{ mt: 8 }}>
-            <Paper sx={{ borderRadius: 3, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-              <Tabs value={tabValue} onChange={handleTabChange} sx={{ borderBottom: '1px solid #e5e7eb', backgroundColor: '#f8f9fa' }}>
-                <Tab label="Description" sx={{ fontWeight: 600 }} />
-                <Tab label="Product Details" sx={{ fontWeight: 600 }} />
-                <Tab label="Reviews" sx={{ fontWeight: 600 }} />
-                <Tab label="Fulfillment" sx={{ fontWeight: 600 }} />
-              </Tabs>
-
-              <TabPanel value={tabValue} index={0}>
-                <Typography variant="body1" sx={{ lineHeight: 1.8, color: '#374151' }}>
-                  {product.description}
-                </Typography>
-                <Box sx={{ mt: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#1f2937' }}>
-                    Key Features
-                  </Typography>
-                  <Grid container spacing={2}>
-                    {product.features.map((feature, index) => (
-                      <Grid item xs={12} sm={6} key={index}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <CheckCircle sx={{ color: '#22c55e', fontSize: 20 }} />
-                          <Typography variant="body1" color="text.secondary">
-                            {feature}
-                          </Typography>
-                        </Box>
-                      </Grid>
-                    ))}
+            {/* Description Section */}
+            <Box sx={{ mb: 6 }}>
+              <Typography variant="h4" sx={{ fontWeight: 600, mb: 3, color: 'text.primary' }}>
+                Product Description
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4, lineHeight: 1.7, maxWidth: 800 }}>
+                {product.description}
+              </Typography>
+              
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, color: 'text.primary' }}>
+                Key Features
+              </Typography>
+              <Grid container spacing={2} sx={{ maxWidth: 800 }}>
+                {product.features.map((feature: string, index: number) => (
+                  <Grid item xs={12} sm={6} key={index}>
+                    <Paper
+                      variant="outlined"
+                      sx={{
+                        p: 2,
+                        borderColor: 'divider',
+                        backgroundColor: 'background.paper'
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                        <Box sx={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          backgroundColor: 'primary.main',
+                          mt: 0.5,
+                          flexShrink: 0
+                        }} />
+                        <Typography variant="body2" sx={{ color: 'text.primary', lineHeight: 1.5 }}>
+                          {feature}
+                        </Typography>
+                      </Box>
+                    </Paper>
                   </Grid>
-                </Box>
-              </TabPanel>
+                ))}
+              </Grid>
+            </Box>
 
-              <TabPanel value={tabValue} index={1}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} md={6}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#1f2937' }}>
-                      Specifications
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: '1px solid #f3f4f6' }}>
-                        <Typography variant="body2" color="text.secondary">Material</Typography>
-                        <Typography variant="body2" fontWeight={500}>Premium Cotton Blend</Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: '1px solid #f3f4f6' }}>
-                        <Typography variant="body2" color="text.secondary">Weight</Typography>
-                        <Typography variant="body2" fontWeight={500}>170 GSM</Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: '1px solid #f3f4f6' }}>
-                        <Typography variant="body2" color="text.secondary">Fit</Typography>
-                        <Typography variant="body2" fontWeight={500}>Comfort Fit</Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: '1px solid #f3f4f6' }}>
-                        <Typography variant="body2" color="text.secondary">Style</Typography>
-                        <Typography variant="body2" fontWeight={500}>Casual Comfort</Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#1f2937' }}>
-                      Available Options
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: '1px solid #f3f4f6' }}>
-                        <Typography variant="body2" color="text.secondary">Colors</Typography>
-                        <Typography variant="body2" fontWeight={500}>{product.colors.length} options</Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: '1px solid #f3f4f6' }}>
-                        <Typography variant="body2" color="text.secondary">Sizes</Typography>
-                        <Typography variant="body2" fontWeight={500}>{product.sizes.length} options</Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: '1px solid #f3f4f6' }}>
-                        <Typography variant="body2" color="text.secondary">Technology</Typography>
-                        <Typography variant="body2" fontWeight={500}>{product.technology.length} options</Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </TabPanel>
+            {/* Product Details Section */}
+            <ProductDetailsAccordion />
 
-              <TabPanel value={tabValue} index={2}>
-                <Box sx={{ textAlign: 'center', py: 4 }}>
-                  <Star sx={{ fontSize: 60, color: '#e5e7eb', mb: 2 }} />
-                  <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-                    No reviews yet
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Be the first to review this product
-                  </Typography>
-                </Box>
-              </TabPanel>
+            {/* Size Guide Accordion */}
+            <SizeGuideAccordion />
 
-              <TabPanel value={tabValue} index={3}>
-                <FulfillmentProvidersSection />
-              </TabPanel>
-            </Paper>
+            {/* Print Areas Accordion */}
+            <PrintAreasAccordion />
+
+            {/* Fulfillment Section */}
+            <FulfillmentOptionsAccordion />
+
+            {/* Reviews Section */}
+            <CustomerReviewsAccordion />
           </Box>
         </Container>
       </Box>
@@ -936,5 +1559,5 @@ const SoftstyleComfortTShirt: React.FC = () => {
     </Box>
   );
 };
+export default ShortSleeveTShirt;
 
-export default SoftstyleComfortTShirt;

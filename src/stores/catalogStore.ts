@@ -96,24 +96,7 @@ const sampleProducts: Product[] = [
     inStock: true,
     tags: ['t-shirts', 'customizable'],
   },
-  {
-    id: 2,
-    name: 'Hoodies',
-    category: 'mens',
-    subcategory: 'Hoodies',
-    gender: 'men',
-    image: '/assets/img/hoodie.jpg',
-    priceUSD: 0,
-    priceAED: 0,
-    priceEGP: 0,
-    description: 'Browse our collection of customizable hoodies',
-    technology: [],
-    brand: 'PrintaRex',
-    colors: [],
-    sizes: [],
-    inStock: true,
-    tags: ['hoodies', 'customizable'],
-  },
+
   
   // Women's Clothing
   {
@@ -134,24 +117,7 @@ const sampleProducts: Product[] = [
     inStock: true,
     tags: ['t-shirts', 'customizable'],
   },
-  {
-    id: 4,
-    name: 'Hoodies',
-    category: 'womens',
-    subcategory: 'Hoodies',
-    gender: 'women',
-    image: '/assets/img/hoodie.jpg',
-    priceUSD: 0,
-    priceAED: 0,
-    priceEGP: 0,
-    description: 'Browse our collection of customizable women\'s hoodies',
-    technology: [],
-    brand: 'PrintaRex',
-    colors: [],
-    sizes: [],
-    inStock: true,
-    tags: ['hoodies', 'customizable'],
-  },
+
   
 
 ];

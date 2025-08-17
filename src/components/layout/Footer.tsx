@@ -17,7 +17,7 @@ const Footer: React.FC = () => {
       title: 'Product',
       links: [
         { label: 'T-Shirts', path: '/app/designer?product=tshirt' },
-        { label: 'Hoodies', path: '/app/designer?product=hoodie' },
+
         { label: 'Catalog', path: '/app/catalog' },
         { label: 'Designer', path: '/app/designer' },
       ],
@@ -71,7 +71,7 @@ const Footer: React.FC = () => {
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
               Create and sell custom products. 100% free to use platform for designing 
-              personalized t-shirts and hoodies.
+              personalized t-shirts.
             </Typography>
           </Grid>
 

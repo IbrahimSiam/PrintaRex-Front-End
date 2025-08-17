@@ -234,23 +234,16 @@ const Catalog: React.FC = () => {
     return (
       <Grid container spacing={3}>
         {filteredProducts.map((product) => (
-          <Grid item xs={12} sm={6} md={4} key={product.id}>
-                         <Card
-               onClick={() => {
-                 if (product.name === 'T-Shirts') {
-                   if (product.category === 'mens') {
-                     navigate('/app/t-shirts');
-                   } else if (product.category === 'womens') {
-                     navigate('/app/womens-t-shirts');
-                   }
-                 } else if (product.name === 'Hoodies') {
-                   if (product.category === 'mens') {
-                     navigate('/app/hoodies');
-                   } else if (product.category === 'womens') {
-                     navigate('/app/womens-hoodies');
-                   }
-                 }
-               }}
+                         <Grid item xs={12} sm={6} md={4} key={product.id}>
+                 <Card
+                   onClick={() => {
+                     if (product.name === 'T-Shirts') {
+                       if (product.category === 'mens') {
+                         navigate('/app/t-shirts');
+                       } else if (product.category === 'womens') {
+                         navigate('/app/womens-t-shirts');
+                       }
+                   }}
                sx={{
                  height: '100%',
                  borderRadius: 3,
@@ -339,13 +332,7 @@ const Catalog: React.FC = () => {
                          } else if (product.category === 'womens') {
                            navigate('/app/womens-t-shirts');
                          }
-                       } else if (product.name === 'Hoodies') {
-                         if (product.category === 'mens') {
-                           navigate('/app/hoodies');
-                         } else if (product.category === 'womens') {
-                           navigate('/app/womens-hoodies');
-                         }
-                       }
+
                      }}
                      sx={{ flex: 1 }}
                    >

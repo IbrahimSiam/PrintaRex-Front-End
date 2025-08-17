@@ -405,8 +405,8 @@ const TShirtIcon: React.FC<{
   );
 };
 
-// Print Areas Section Component
-const PrintAreasSection: React.FC = () => {
+// Print Areas Accordion Component
+const PrintAreasAccordion: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'DTG' | 'DTF'>('DTG');
   const [selectedArea, setSelectedArea] = useState<string>('front');
   
@@ -433,108 +433,127 @@ const PrintAreasSection: React.FC = () => {
   };
   
   return (
-    <Paper 
-      sx={{ 
-        border: '1px solid', 
-        borderColor: 'divider', 
-        borderRadius: 8, 
-        p: 2, 
-        mt: 2 
+    <Accordion
+      defaultExpanded
+      square={false}
+      disableGutters
+      elevation={0}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        mt: 2,
+        '&:before': { display: 'none' }
       }}
     >
-      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 3, color: 'text.primary' }}>
-        Print areas
-      </Typography>
-      
-      {/* DTG/DTF Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <ToggleButtonGroup
-          value={activeTab}
-          exclusive
-          onChange={handleTabChange}
-          aria-label="Print technology tabs"
-          sx={{
-            '& .MuiToggleButton-root': {
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              textTransform: 'none',
-              minHeight: 40,
-              px: 3
-            },
-            '& .MuiToggleButtonGroup-grouped': {
-              margin: 0,
-              border: 'none'
-            }
-          }}
-        >
-          <ToggleButton 
-            value="DTG" 
-            aria-label="DTG print technology"
+      <AccordionSummary
+        expandIcon={
+          <Box
+            sx={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: 'action.hover',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
           >
-            DTG
-          </ToggleButton>
-          <ToggleButton 
-            value="DTF" 
-            aria-label="DTF print technology"
+            <ExpandMore sx={{ fontSize: 20, color: 'text.secondary' }} />
+          </Box>
+        }
+        sx={{
+          '& .MuiAccordionSummary-content': {
+            margin: 0
+          }
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          Print areas
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ pt: 0, pb: 2 }}>
+        {/* DTG/DTF Tabs */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <ToggleButtonGroup
+            value={activeTab}
+            exclusive
+            onChange={handleTabChange}
+            aria-label="Print technology tabs"
+            size="small"
+            sx={{
+              '& .MuiToggleButton-root': {
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                textTransform: 'none',
+                px: 3,
+                py: 1
+              }
+            }}
           >
-            DTF
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
-      
-      {/* Print Areas Grid */}
-      <Grid container spacing={3} justifyContent="center">
-        {TAB_AREAS[activeTab].map((area) => (
-          <Grid item xs={6} md="auto" key={area.key}>
-            <ButtonBase
-              onClick={() => handleAreaSelect(area.key)}
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                p: 1,
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: selectedArea === area.key ? 'primary.main' : 'divider',
-                borderWidth: selectedArea === area.key ? 2 : 1,
-                transition: 'all 0.2s ease-in-out',
-                '&:hover': {
-                  borderColor: 'text.primary',
-                  boxShadow: 2,
-                  '& .tshirt-icon': {
-                    color: 'text.primary'
+            <ToggleButton value="DTG" aria-label="DTG">
+              DTG
+            </ToggleButton>
+            <ToggleButton value="DTF" aria-label="DTF">
+              DTF
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+        
+        {/* Print Areas Grid */}
+        <Grid container spacing={3} justifyContent="center">
+          {TAB_AREAS[activeTab].map((area) => (
+            <Grid item xs={6} md="auto" key={area.key}>
+              <ButtonBase
+                onClick={() => handleAreaSelect(area.key)}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  p: 1,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: selectedArea === area.key ? 'primary.main' : 'divider',
+                  borderWidth: selectedArea === area.key ? 2 : 1,
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    borderColor: 'text.primary',
+                    boxShadow: 2,
+                    '& .tshirt-icon': {
+                      color: 'text.primary'
+                    }
+                  },
+                  '&:focus-visible': {
+                    outline: '2px solid',
+                    outlineColor: 'primary.main',
+                    outlineOffset: 2
                   }
-                },
-                '&:focus-visible': {
-                  outline: '2px solid',
-                  outlineColor: 'primary.main',
-                  outlineOffset: 2
-                }
-              }}
-              role="button"
-              aria-label={`${area.label} print area`}
-              aria-pressed={selectedArea === area.key}
-            >
-              <Box sx={{ mb: 1 }}>
-                <TShirtIcon 
-                  area={area.key} 
-                  selected={selectedArea === area.key}
-                />
-              </Box>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: selectedArea === area.key ? 'text.primary' : 'text.secondary',
-                  fontWeight: selectedArea === area.key ? 600 : 500
                 }}
+                role="button"
+                aria-label={`${area.label} print area`}
+                aria-pressed={selectedArea === area.key}
               >
-                {area.label}
-              </Typography>
-            </ButtonBase>
-          </Grid>
-        ))}
-      </Grid>
-    </Paper>
+                <Box sx={{ mb: 1 }}>
+                  <TShirtIcon 
+                    area={area.key} 
+                    selected={selectedArea === area.key}
+                  />
+                </Box>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: selectedArea === area.key ? 'text.primary' : 'text.secondary',
+                    fontWeight: selectedArea === area.key ? 600 : 500
+                  }}
+                >
+                  {area.label}
+                </Typography>
+              </ButtonBase>
+            </Grid>
+          ))}
+        </Grid>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 
@@ -1302,8 +1321,8 @@ const WomensShortSleeveCropTop: React.FC = () => {
             {/* Size Guide Accordion */}
             <SizeGuideAccordion />
 
-            {/* Print Areas Section */}
-            <PrintAreasSection />
+            {/* Print Areas Accordion */}
+            <PrintAreasAccordion />
 
             {/* Fulfillment Section */}
             <FulfillmentOptionsAccordion />

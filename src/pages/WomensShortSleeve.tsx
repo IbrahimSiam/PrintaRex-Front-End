@@ -5,12 +5,12 @@ import {
   Avatar, TextField, InputAdornment, Badge, Drawer, List, ListItem,
   ListItemIcon, ListItemText, Divider, Fab, Tooltip, ToggleButtonGroup,
   ToggleButton, FormControl, InputLabel, Select, MenuItem, Tabs, Tab,
-  Paper, Rating, Stack
+  Paper, Rating, Stack, Accordion, AccordionSummary, AccordionDetails
 } from '@mui/material';
 import {
   Menu, Search, NotificationsNone, Settings, Home, ChevronLeft,
   ChevronRight, PushPin, PushPinOutlined, ArrowBack, LocalShipping,
-  CheckCircle, Star, ShoppingCart, Storefront
+  CheckCircle, Star, ShoppingCart, Storefront, ExpandMore
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../stores/uiStore';
@@ -495,9 +495,170 @@ const WomensShortSleeve: React.FC = () => {
               </TabPanel>
             </Card>
           </Box>
+
+          {/* Print Areas */}
+          <PrintAreasAccordion />
         </Container>
       </Box>
     </Box>
+  );
+};
+
+// Print Areas Accordion Component
+const PrintAreasAccordion: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'DTG' | 'DTF'>('DTG');
+  const [selectedArea, setSelectedArea] = useState<string>('front');
+  
+  const AREAS = [
+    { key: 'front', label: 'Front' },
+    { key: 'back', label: 'Back' },
+    { key: 'leftSleeve', label: 'Left sleeve' },
+    { key: 'rightSleeve', label: 'Right sleeve' },
+    { key: 'innerNeck', label: 'Inner neck' },
+    { key: 'outerNeck', label: 'Outer neck' },
+  ];
+  
+  const TAB_AREAS = { DTG: AREAS, DTF: AREAS };
+  
+  const handleTabChange = (event: React.SyntheticEvent, newValue: 'DTG' | 'DTF') => {
+    if (newValue !== null) {
+      setActiveTab(newValue);
+      setSelectedArea('front'); // Reset selection when switching tabs
+    }
+  };
+  
+  const handleAreaSelect = (areaKey: string) => {
+    setSelectedArea(areaKey);
+  };
+  
+  return (
+    <Accordion
+      defaultExpanded
+      square={false}
+      disableGutters
+      elevation={0}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        mt: 2,
+        '&:before': { display: 'none' }
+      }}
+    >
+      <AccordionSummary
+        expandIcon={
+          <Box
+            sx={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              backgroundColor: 'action.hover',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <ExpandMore sx={{ fontSize: 20, color: 'text.secondary' }} />
+          </Box>
+        }
+        sx={{
+          '& .MuiAccordionSummary-content': {
+            margin: 0
+          }
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          Print areas
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ pt: 0, pb: 2 }}>
+        {/* DTG/DTF Tabs */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <Tabs 
+            value={activeTab} 
+            onChange={handleTabChange}
+            aria-label="Print technology tabs"
+            sx={{
+              '& .MuiTab-root': {
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                textTransform: 'none',
+                minHeight: 40,
+                px: 3
+              },
+              '& .MuiTabs-indicator': {
+                height: 2,
+                borderRadius: '1px 1px 0 0'
+              }
+            }}
+          >
+            <Tab 
+              label="DTG" 
+              value="DTG"
+              sx={{ fontSize: '0.875rem' }}
+            />
+            <Tab 
+              label="DTF" 
+              value="DTF"
+              sx={{ fontSize: '0.875rem' }}
+            />
+          </Tabs>
+        </Box>
+        
+        {/* Print Areas Grid */}
+        <Grid container spacing={3} justifyContent="center">
+          {TAB_AREAS[activeTab].map((area) => (
+            <Grid item xs={6} md="auto" key={area.key}>
+              <ButtonBase
+                onClick={() => handleAreaSelect(area.key)}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  p: 1,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: selectedArea === area.key ? 'primary.main' : 'divider',
+                  borderWidth: selectedArea === area.key ? 2 : 1,
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    borderColor: 'text.primary',
+                    boxShadow: 2,
+                    '& .tshirt-icon': {
+                      color: 'text.primary'
+                    }
+                  },
+                  '&:focus-visible': {
+                    outline: '2px solid',
+                    outlineColor: 'primary.main',
+                    outlineOffset: 2
+                  }
+                }}
+                role="button"
+                aria-label={`${area.label} print area`}
+                aria-pressed={selectedArea === area.key}
+              >
+                <Box sx={{ mb: 1 }}>
+                  <TShirtIcon 
+                    area={area.key} 
+                    selected={selectedArea === area.key}
+                  />
+                </Box>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: selectedArea === area.key ? 'text.primary' : 'text.secondary',
+                    fontWeight: selectedArea === area.key ? 600 : 500
+                  }}
+                >
+                  {area.label}
+                </Typography>
+              </ButtonBase>
+            </Grid>
+          ))}
+        </Grid>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 

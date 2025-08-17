@@ -25,7 +25,7 @@ const Landing: React.FC = () => {
 
   const features = [
     '100% free to use',
-    'T shirts & hoodies',
+    'T shirts',
     'Global delivery (soon)',
   ]
 
@@ -87,7 +87,7 @@ const Landing: React.FC = () => {
                 color="text.secondary"
                 sx={{ mb: 4, fontWeight: 400, lineHeight: 1.4 }}
               >
-                Design your own t-shirts and hoodies with our powerful online editor. 
+                Design your own t-shirts with our powerful online editor. 
                 Start selling custom products today!
               </Typography>
 
@@ -217,48 +217,7 @@ const Landing: React.FC = () => {
                     </CardContent>
                   </Card>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Card
-                    sx={{
-                      borderRadius: '16px',
-                      border: '1px solid #e5e7eb',
-                      overflow: 'hidden',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      '&:hover': {
-                        transform: 'translateY(-8px) scale(1.02)',
-                        boxShadow: '0 20px 40px -12px rgba(0, 0, 0, 0.25)',
-                        borderColor: theme.palette.primary.main,
-                      },
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        height: 200,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: '#f0f0f0',
-                        overflow: 'hidden',
-                        border: '1px solid #e5e7eb',
-                      }}
-                    >
-                      <img
-                        src="/assets/gifs/hoodie.gif"
-                        alt="Customize a Hoodie - animated demonstration"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                        }}
-                      />
-                    </Box>
-                    <CardContent sx={{ py: 1.5, textAlign: 'center' }}>
-                      <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                        Customize a Hoodie
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
+
               </Grid>
             </Grid>
           </Grid>
