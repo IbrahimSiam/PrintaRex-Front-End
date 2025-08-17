@@ -17,9 +17,10 @@ const Footer: React.FC = () => {
       title: 'Product',
       links: [
         { label: 'T-Shirts', path: '/app/designer?product=tshirt' },
-
         { label: 'Catalog', path: '/app/catalog' },
         { label: 'Designer', path: '/app/designer' },
+        { label: 'Stores', path: '/stores' },
+        { label: 'Branded Packaging', path: '/branded-packing' },
       ],
     },
     {
@@ -29,6 +30,14 @@ const Footer: React.FC = () => {
         { label: 'Pricing', path: '/pricing' },
         { label: 'Contact', path: '/contact' },
         { label: 'Support', path: '/support' },
+      ],
+    },
+    {
+      title: 'Resources',
+      links: [
+        { label: 'Insights', path: '/insights' },
+        { label: 'Help Center', path: '/support' },
+        { label: 'Design Guides', path: '/app/designer' },
       ],
     },
     {
@@ -73,6 +82,26 @@ const Footer: React.FC = () => {
               Create and sell custom products. 100% free to use platform for designing 
               personalized t-shirts.
             </Typography>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Link
+                component="button"
+                variant="body2"
+                color="primary"
+                onClick={() => handleNavigation('/login')}
+                sx={{ textDecoration: 'none', fontWeight: 500 }}
+              >
+                Log In
+              </Link>
+              <Link
+                component="button"
+                variant="body2"
+                color="primary"
+                onClick={() => handleNavigation('/signup')}
+                sx={{ textDecoration: 'none', fontWeight: 500 }}
+              >
+                Sign Up
+              </Link>
+            </Box>
           </Grid>
 
           {/* Footer Links */}

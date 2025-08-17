@@ -29,6 +29,11 @@ import WomensFashionTShirt from '../pages/WomensFashionTShirt';
 import WomensComfortTShirt from '../pages/WomensComfortTShirt';
 import WomensPremiumTShirt from '../pages/WomensPremiumTShirt';
 import WomensSportTShirt from '../pages/WomensSportTShirt';
+import SalesChannels from '../pages/SalesChannels';
+import BrandedPackaging from '../pages/BrandedPackaging';
+import Insights from '../pages/Insights';
+import SignUp from '../pages/SignUp';
+import Login from '../pages/Login';
 
 import PlaceholderPage from '../components/PlaceholderPage';
 
@@ -97,6 +102,11 @@ const App: React.FC = () => {
           <Route path="/app/womens-softstyle-comfort" element={<WomensSoftstyleComfort />} />
           <Route path="/app/womens-slim-fit" element={<WomensSlimFit />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/stores" element={<SalesChannels />} />
+          <Route path="/branded-packing" element={<BrandedPackaging />} />
+          <Route path="/insights" element={<Insights />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/pricing" element={<PlaceholderPage title="Pricing" message="Pricing information will be available soon!" />} />
           <Route path="/support" element={<PlaceholderPage title="Support" message="Support center is coming soon!" />} />
           <Route path="/legal/terms" element={<PlaceholderPage title="Terms of Service" message="Terms of service will be available soon!" />} />
