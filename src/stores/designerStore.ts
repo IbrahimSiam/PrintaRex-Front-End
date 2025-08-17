@@ -10,32 +10,30 @@ export interface PrintArea {
 }
 
 export interface Mockup {
-  id: number;
+  id: string;
   name: string;
-  image: string;
+  imageUrl: string;
+  description: string;
   isPrimary: boolean;
+  tags: string[];
 }
 
-export interface ProductDetails {
+export interface Details {
   title: string;
   description: string;
-  sizeTable: {
-    metric: boolean;
-    sizes: Array<{
-      size: string;
-      chest: string;
-      length: string;
-      chestInch: string;
-      lengthInch: string;
-    }>;
-  };
-  careInstructions: string;
   tags: string[];
+  careInstructions: {
+    washing: string;
+    drying: string;
+    ironing: string;
+    additional: string;
+  };
 }
 
 export interface PricingData {
   currency: string;
   variants: Array<{
+    id: string;
     size: string;
     retailPrice: number;
     productCost: number;
@@ -57,11 +55,11 @@ export interface DesignerState {
   
   // Mockups
   mockups: Mockup[];
-  setPrimaryMockup: (mockupId: number) => void;
+  setPrimaryMockup: (mockupId: string) => void;
   
   // Product details
-  productDetails: ProductDetails;
-  updateProductDetails: (updates: Partial<ProductDetails>) => void;
+  details: Details;
+  updateDetails: (updates: Partial<Details>) => void;
   
   // Pricing
   pricing: PricingData;
@@ -77,6 +75,11 @@ export interface DesignerState {
   nextStep: () => void;
   previousStep: () => void;
   
+  // Actions
+  saveTemplate: () => void;
+  addToStore: () => void;
+  placeOrder: () => void;
+  
   // Reset
   resetDesigner: () => void;
 }
@@ -91,37 +94,60 @@ const INITIAL_PRINT_AREAS: PrintArea[] = [
 ];
 
 const INITIAL_MOCKUPS: Mockup[] = [
-  { id: 1, name: 'Front View', image: '/assets/img/tee.jpg', isPrimary: true },
-  { id: 2, name: 'Back View', image: '/assets/img/tee-back.jpg', isPrimary: false },
-  { id: 3, name: 'Side View', image: '/assets/img/tee-side1.jpg', isPrimary: false },
-  { id: 4, name: 'Lifestyle', image: '/assets/img/tee-side2.jpg', isPrimary: false },
+  { 
+    id: '1', 
+    name: 'Front View', 
+    imageUrl: '/assets/img/tee.jpg', 
+    description: 'Classic front view of the t-shirt',
+    isPrimary: true,
+    tags: ['front', 'classic']
+  },
+  { 
+    id: '2', 
+    name: 'Back View', 
+    imageUrl: '/assets/img/tee-back.jpg', 
+    description: 'Back view showing the design',
+    isPrimary: false,
+    tags: ['back', 'design']
+  },
+  { 
+    id: '3', 
+    name: 'Side View', 
+    imageUrl: '/assets/img/tee-side1.jpg', 
+    description: 'Side profile of the t-shirt',
+    isPrimary: false,
+    tags: ['side', 'profile']
+  },
+  { 
+    id: '4', 
+    name: 'Lifestyle', 
+    imageUrl: '/assets/img/tee-side2.jpg', 
+    description: 'Lifestyle shot in context',
+    isPrimary: false,
+    tags: ['lifestyle', 'context']
+  },
 ];
 
-const INITIAL_PRODUCT_DETAILS: ProductDetails = {
+const INITIAL_DETAILS: Details = {
   title: 'Custom Short Sleeve T-Shirt',
   description: 'High-quality custom t-shirt with your unique design. Perfect for personal use, gifts, or business branding.',
-  sizeTable: {
-    metric: true,
-    sizes: [
-      { size: 'S', chest: '90-95', length: '68', chestInch: '35-37', lengthInch: '27' },
-      { size: 'M', chest: '95-100', length: '70', chestInch: '37-39', lengthInch: '28' },
-      { size: 'L', chest: '100-105', length: '72', chestInch: '39-41', lengthInch: '28' },
-      { size: 'XL', chest: '105-110', length: '74', chestInch: '41-43', lengthInch: '29' },
-      { size: '2XL', chest: '110-115', length: '76', chestInch: '43-45', lengthInch: '30' },
-    ],
-  },
-  careInstructions: 'Machine wash cold, tumble dry low. Do not bleach. Iron on low if needed.',
   tags: ['custom', 't-shirt', 'print-on-demand'],
+  careInstructions: {
+    washing: 'Machine wash cold, gentle cycle',
+    drying: 'Tumble dry low, or air dry',
+    ironing: 'Iron on low heat if needed',
+    additional: 'Do not bleach. Wash with similar colors.',
+  },
 };
 
 const INITIAL_PRICING: PricingData = {
-  currency: 'AED',
+  currency: 'USD',
   variants: [
-    { size: 'S', retailPrice: 120, productCost: 45.5, shipping: 18, estimatedProfit: 56.5 },
-    { size: 'M', retailPrice: 120, productCost: 45.5, shipping: 18, estimatedProfit: 56.5 },
-    { size: 'L', retailPrice: 120, productCost: 45.5, shipping: 18, estimatedProfit: 56.5 },
-    { size: 'XL', retailPrice: 120, productCost: 45.5, shipping: 18, estimatedProfit: 56.5 },
-    { size: '2XL', retailPrice: 120, productCost: 45.5, shipping: 18, estimatedProfit: 56.5 },
+    { id: 's', size: 'S', retailPrice: 29.99, productCost: 12.50, shipping: 5.99, estimatedProfit: 11.50 },
+    { id: 'm', size: 'M', retailPrice: 29.99, productCost: 12.50, shipping: 5.99, estimatedProfit: 11.50 },
+    { id: 'l', size: 'L', retailPrice: 29.99, productCost: 12.50, shipping: 5.99, estimatedProfit: 11.50 },
+    { id: 'xl', size: 'XL', retailPrice: 29.99, productCost: 12.50, shipping: 5.99, estimatedProfit: 11.50 },
+    { id: 'xxl', size: 'XXL', retailPrice: 32.99, productCost: 13.50, shipping: 5.99, estimatedProfit: 13.50 },
   ],
 };
 
@@ -145,7 +171,7 @@ export const useDesignerStore = create<DesignerState>()(
       
       // Mockups
       mockups: INITIAL_MOCKUPS,
-      setPrimaryMockup: (mockupId: number) => set((state) => ({
+      setPrimaryMockup: (mockupId: string) => set((state) => ({
         mockups: state.mockups.map(mockup => ({
           ...mockup,
           isPrimary: mockup.id === mockupId
@@ -153,9 +179,9 @@ export const useDesignerStore = create<DesignerState>()(
       })),
       
       // Product details
-      productDetails: INITIAL_PRODUCT_DETAILS,
-      updateProductDetails: (updates: Partial<ProductDetails>) => set((state) => ({
-        productDetails: { ...state.productDetails, ...updates }
+      details: INITIAL_DETAILS,
+      updateDetails: (updates: Partial<Details>) => set((state) => ({
+        details: { ...state.details, ...updates }
       })),
       
       // Pricing
@@ -199,17 +225,20 @@ export const useDesignerStore = create<DesignerState>()(
         const currentIndex = stepOrder.indexOf(state.activeStep);
         const targetIndex = stepOrder.indexOf(step);
         
-        // Can go back to any previous step
-        if (targetIndex <= currentIndex) return true;
+        // Can only move forward if current step is valid
+        if (targetIndex > currentIndex) {
+          return state.stepValidation[state.activeStep];
+        }
         
-        // Can only go forward if current step is valid
-        return state.stepValidation[state.activeStep];
+        // Can always move backward
+        return true;
       },
       
       nextStep: () => {
         const state = get();
         const stepOrder: DesignerStep[] = ['design', 'mockups', 'details', 'prices', 'review'];
         const currentIndex = stepOrder.indexOf(state.activeStep);
+        
         if (currentIndex < stepOrder.length - 1 && state.stepValidation[state.activeStep]) {
           set({ activeStep: stepOrder[currentIndex + 1] });
         }
@@ -219,9 +248,26 @@ export const useDesignerStore = create<DesignerState>()(
         const state = get();
         const stepOrder: DesignerStep[] = ['design', 'mockups', 'details', 'prices', 'review'];
         const currentIndex = stepOrder.indexOf(state.activeStep);
+        
         if (currentIndex > 0) {
           set({ activeStep: stepOrder[currentIndex - 1] });
         }
+      },
+      
+      // Actions
+      saveTemplate: () => {
+        console.log('Saving template...');
+        // Implementation for saving template
+      },
+      
+      addToStore: () => {
+        console.log('Adding to store...');
+        // Implementation for adding to store
+      },
+      
+      placeOrder: () => {
+        console.log('Placing order...');
+        // Implementation for placing order
       },
       
       // Reset
@@ -230,7 +276,7 @@ export const useDesignerStore = create<DesignerState>()(
         printAreas: INITIAL_PRINT_AREAS,
         selectedPrintArea: 'front',
         mockups: INITIAL_MOCKUPS,
-        productDetails: INITIAL_PRODUCT_DETAILS,
+        details: INITIAL_DETAILS,
         pricing: INITIAL_PRICING,
         stepValidation: {
           design: true,
@@ -244,10 +290,11 @@ export const useDesignerStore = create<DesignerState>()(
     {
       name: 'designer-store',
       partialize: (state) => ({
+        activeStep: state.activeStep,
         printAreas: state.printAreas,
         selectedPrintArea: state.selectedPrintArea,
         mockups: state.mockups,
-        productDetails: state.productDetails,
+        details: state.details,
         pricing: state.pricing,
         stepValidation: state.stepValidation,
       }),

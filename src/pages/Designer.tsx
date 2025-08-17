@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   AppBar,
@@ -13,19 +13,18 @@ import {
   ArrowBack,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useDesignerStore } from '../stores/designerStore';
 import DesignerStepTabs from '../components/designer/DesignerStepTabs';
+import EnhancedDesignerSidebar from '../components/designer/EnhancedDesignerSidebar';
 import DesignerContent from '../components/designer/DesignerContent';
 
 const Designer: React.FC = () => {
   const navigate = useNavigate();
-  const { activeStep, setStepValidation } = useDesignerStore();
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Initialize validation for details step
   useEffect(() => {
-    // This will be updated by the DetailsView component
-    setStepValidation('details', false);
-  }, [setStepValidation]);
+    console.log('Designer component mounted');
+    setIsLoaded(true);
+  }, []);
 
   const handleBack = () => {
     navigate(-1);
@@ -33,16 +32,25 @@ const Designer: React.FC = () => {
 
   const handlePreview = () => {
     console.log('Preview design');
-    // Implementation for preview
   };
 
   const handleSave = () => {
     console.log('Save design');
-    // Implementation for save
   };
 
+  if (!isLoaded) {
+    return (
+      <Box sx={{ p: 4, textAlign: 'center' }}>
+        <Typography variant="h6">Loading Designer...</Typography>
+      </Box>
+    );
+  }
+
   return (
-    <Box sx={{ display: 'flex', height: '100vh' }}>
+    <Box sx={{ display: 'flex', height: '100vh', bgcolor: '#f5f5f5' }}>
+      {/* Enhanced Left Sidebar */}
+      <EnhancedDesignerSidebar />
+
       {/* Main Content */}
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Top App Bar */}
@@ -66,8 +74,10 @@ const Designer: React.FC = () => {
         {/* Design Steps */}
         <DesignerStepTabs />
 
-        {/* Main Content Area */}
-        <DesignerContent />
+        {/* Main Design Content Area */}
+        <Box sx={{ flex: 1, overflow: 'hidden' }}>
+          <DesignerContent />
+        </Box>
       </Box>
     </Box>
   );

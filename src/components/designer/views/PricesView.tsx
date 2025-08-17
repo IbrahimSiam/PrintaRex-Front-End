@@ -1,15 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
-  Grid,
-  Card,
-  CardContent,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -17,225 +9,245 @@ import {
   TableHead,
   TableRow,
   Paper,
-  InputAdornment,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Chip,
+  Grid,
+  Card,
+  CardContent,
+  Divider,
 } from '@mui/material';
 import { useDesignerStore } from '../../../stores/designerStore';
-import DesignerSidebar from '../DesignerSidebar';
+import { useSidebarStore } from '../../../stores/sidebarStore';
+import EnhancedDesignerSidebar from '../EnhancedDesignerSidebar';
+import ProfessionalToolPanel from '../ProfessionalToolPanel';
 
 const PricesView: React.FC = () => {
-  const { pricing, updatePricing, updateVariantPrice } = useDesignerStore();
+  const { pricing, updatePricing } = useDesignerStore();
+  const { activeTool } = useSidebarStore();
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
 
-  const handleCurrencyChange = (currency: string) => {
-    updatePricing({ currency });
+  const handlePriceChange = (variantId: string, field: string, value: number) => {
+    const updatedVariants = pricing.variants.map(variant => {
+      if (variant.id === variantId) {
+        return { ...variant, [field]: value };
+      }
+      return variant;
+    });
+    updatePricing({ variants: updatedVariants });
   };
 
-  const handleRetailPriceChange = (size: string, value: number) => {
-    updateVariantPrice(size, 'retailPrice', value);
+  const calculateProfit = (variant: any) => {
+    const retailPrice = variant.retailPrice || 0;
+    const productCost = variant.productCost || 0;
+    const shipping = variant.shipping || 0;
+    return Math.max(0, retailPrice - productCost - shipping);
   };
 
-  const handleProductCostChange = (size: string, value: number) => {
-    updateVariantPrice(size, 'productCost', value);
-  };
-
-  const handleShippingChange = (size: string, value: number) => {
-    updateVariantPrice(size, 'shipping', value);
-  };
-
-  const calculateTotalProfit = () => {
-    return pricing.variants.reduce((total, variant) => total + variant.estimatedProfit, 0);
-  };
-
-  const calculateAverageProfit = () => {
-    return calculateTotalProfit() / pricing.variants.length;
-  };
+  const totalProfit = pricing.variants.reduce((sum, variant) => sum + calculateProfit(variant), 0);
+  const averageProfit = totalProfit / pricing.variants.length;
 
   return (
     <>
-      {/* Left Sidebar */}
-      <DesignerSidebar />
-      
-      {/* Main Content - Pricing Tables */}
-      <Box sx={{ flex: 1, p: 3, overflow: 'auto' }}>
-        <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
-          Pricing & Profit
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-          Set your retail prices and view profit margins for each size variant.
-        </Typography>
-        
-        <Grid container spacing={3}>
-          {/* Currency and Settings */}
-          <Grid item xs={12} md={4}>
-            <Card sx={{ mb: 3 }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 2 }}>Pricing Settings</Typography>
-                
-                <FormControl fullWidth sx={{ mb: 2 }}>
+      {/* Enhanced Left Sidebar */}
+      <EnhancedDesignerSidebar />
+
+      {/* Professional Tool Panel - Only show when a tool is selected */}
+      {activeTool && <ProfessionalToolPanel isVisible={true} />}
+
+      {/* Main Content - Now centered and clean */}
+      <Box sx={{ 
+        flex: 1, 
+        p: 3,
+        ml: '64px', // Account for collapsed sidebar width
+      }}>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" sx={{ mb: 1, fontWeight: 600 }}>
+            Pricing & Profit
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Set your retail prices and view profit calculations
+          </Typography>
+        </Box>
+
+        <Grid container spacing={4}>
+          {/* Pricing Table */}
+          <Grid item xs={12} lg={8}>
+            <Paper sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  Variant Pricing
+                </Typography>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
                   <InputLabel>Currency</InputLabel>
                   <Select
-                    value={pricing.currency}
+                    value={selectedCurrency}
                     label="Currency"
-                    onChange={(e) => handleCurrencyChange(e.target.value)}
+                    onChange={(e) => setSelectedCurrency(e.target.value)}
                   >
-                    <MenuItem value="AED">AED (UAE Dirham)</MenuItem>
-                    <MenuItem value="USD">USD (US Dollar)</MenuItem>
-                    <MenuItem value="EUR">EUR (Euro)</MenuItem>
-                    <MenuItem value="GBP">GBP (British Pound)</MenuItem>
+                    <MenuItem value="USD">USD ($)</MenuItem>
+                    <MenuItem value="EUR">EUR (€)</MenuItem>
+                    <MenuItem value="GBP">GBP (£)</MenuItem>
+                    <MenuItem value="CAD">CAD (C$)</MenuItem>
                   </Select>
                 </FormControl>
-                
-                <Typography variant="body2" color="text.secondary">
-                  Choose the currency for your pricing. This will be displayed to customers in your store.
-                </Typography>
-              </CardContent>
-            </Card>
-            
-            {/* Profit Summary */}
-            <Card>
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 2 }}>Profit Summary</Typography>
-                
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Total Estimated Profit
-                  </Typography>
-                  <Typography variant="h5" color="success.main" sx={{ fontWeight: 600 }}>
-                    {pricing.currency} {calculateTotalProfit().toFixed(2)}
-                  </Typography>
-                </Box>
-                
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Average Profit per Item
-                  </Typography>
-                  <Typography variant="h6" color="success.main" sx={{ fontWeight: 600 }}>
-                    {pricing.currency} {calculateAverageProfit().toFixed(2)}
-                  </Typography>
-                </Box>
-                
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Total Variants
-                  </Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    {pricing.variants.length}
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-          
-          {/* Pricing Table */}
-          <Grid item xs={12} md={8}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 2 }}>Pricing Table</Typography>
-                
-                <TableContainer component={Paper} variant="outlined">
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Size</TableCell>
-                        <TableCell align="right">Retail Price</TableCell>
-                        <TableCell align="right">Product Cost</TableCell>
-                        <TableCell align="right">Shipping</TableCell>
-                        <TableCell align="right">Estimated Profit</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {pricing.variants.map((variant) => (
-                        <TableRow key={variant.size}>
-                          <TableCell sx={{ fontWeight: 600 }}>{variant.size}</TableCell>
-                          <TableCell align="right">
+              </Box>
+
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 600 }}>Size</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Retail Price</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Product Cost</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Shipping</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Estimated Profit</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Margin %</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {pricing.variants.map((variant) => {
+                      const profit = calculateProfit(variant);
+                      const margin = variant.retailPrice > 0 ? (profit / variant.retailPrice) * 100 : 0;
+                      
+                      return (
+                        <TableRow key={variant.id}>
+                          <TableCell sx={{ fontWeight: 600 }}>
+                            <Chip label={variant.size} size="small" variant="outlined" />
+                          </TableCell>
+                          <TableCell>
                             <TextField
-                              type="number"
-                              value={variant.retailPrice}
-                              onChange={(e) => handleRetailPriceChange(variant.size, Number(e.target.value))}
                               size="small"
+                              type="number"
+                              value={variant.retailPrice || ''}
+                              onChange={(e) => handlePriceChange(variant.id, 'retailPrice', parseFloat(e.target.value) || 0)}
                               InputProps={{
-                                startAdornment: <InputAdornment position="start">{pricing.currency}</InputAdornment>,
+                                startAdornment: <span>{selectedCurrency === 'USD' ? '$' : selectedCurrency === 'EUR' ? '€' : selectedCurrency === 'GBP' ? '£' : 'C$'}</span>,
                               }}
-                              sx={{ width: 120 }}
+                              sx={{ width: 100 }}
                             />
                           </TableCell>
-                          <TableCell align="right">
-                            <TextField
-                              type="number"
-                              value={variant.productCost}
-                              onChange={(e) => handleProductCostChange(variant.size, Number(e.target.value))}
-                              size="small"
-                              InputProps={{
-                                startAdornment: <InputAdornment position="start">{pricing.currency}</InputAdornment>,
-                              }}
-                              sx={{ width: 120 }}
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <TextField
-                              type="number"
-                              value={variant.shipping}
-                              onChange={(e) => handleShippingChange(variant.size, Number(e.target.value))}
-                              size="small"
-                              InputProps={{
-                                startAdornment: <InputAdornment position="start">{pricing.currency}</InputAdornment>,
-                              }}
-                              sx={{ width: 120 }}
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography color="success.main" sx={{ fontWeight: 600 }}>
-                              {pricing.currency} {variant.estimatedProfit.toFixed(2)}
+                          <TableCell>
+                            <Typography variant="body2" color="text.secondary">
+                              {selectedCurrency === 'USD' ? '$' : selectedCurrency === 'EUR' ? '€' : selectedCurrency === 'GBP' ? '£' : 'C$'}{variant.productCost?.toFixed(2) || '0.00'}
                             </Typography>
                           </TableCell>
+                          <TableCell>
+                            <Typography variant="body2" color="text.secondary">
+                              {selectedCurrency === 'USD' ? '$' : selectedCurrency === 'EUR' ? '€' : selectedCurrency === 'GBP' ? '£' : 'C$'}{variant.shipping?.toFixed(2) || '0.00'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontWeight: 600,
+                                color: profit > 0 ? 'success.main' : 'error.main',
+                              }}
+                            >
+                              {selectedCurrency === 'USD' ? '$' : selectedCurrency === 'EUR' ? '€' : selectedCurrency === 'GBP' ? '£' : 'C$'}{profit.toFixed(2)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={`${margin.toFixed(1)}%`}
+                              size="small"
+                              color={margin > 20 ? 'success' : margin > 10 ? 'warning' : 'error'}
+                              variant="outlined"
+                            />
+                          </TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          </Grid>
+
+          {/* Profit Summary */}
+          <Grid item xs={12} lg={4}>
+            <Card sx={{ height: 'fit-content' }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+                  Profit Summary
+                </Typography>
                 
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                  Edit retail prices, product costs, and shipping to see profit calculations update automatically.
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Total Variants
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                      {pricing.variants.length}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Average Retail Price
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                      {selectedCurrency === 'USD' ? '$' : selectedCurrency === 'EUR' ? '€' : selectedCurrency === 'GBP' ? '£' : 'C$'}
+                      {(pricing.variants.reduce((sum, v) => sum + (v.retailPrice || 0), 0) / pricing.variants.length).toFixed(2)}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Total Profit
+                    </Typography>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 600,
+                        color: totalProfit > 0 ? 'success.main' : 'error.main',
+                      }}
+                    >
+                      {selectedCurrency === 'USD' ? '$' : selectedCurrency === 'EUR' ? '€' : selectedCurrency === 'GBP' ? '£' : 'C$'}{totalProfit.toFixed(2)}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Average Profit
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: 600,
+                        color: averageProfit > 0 ? 'success.main' : 'error.main',
+                      }}
+                    >
+                      {selectedCurrency === 'USD' ? '$' : selectedCurrency === 'EUR' ? '€' : selectedCurrency === 'GBP' ? '£' : 'C$'}{averageProfit.toFixed(2)}
+                    </Typography>
+                  </Box>
+                </Box>
+                
+                <Divider sx={{ my: 3 }} />
+                
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  <strong>Tips for better pricing:</strong>
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                  • Aim for 30-50% profit margins
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                  • Consider your target market
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                  • Factor in marketing costs
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                  • Monitor competitor pricing
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
-      </Box>
-
-      {/* Right Panel - Pricing Tips */}
-      <Box sx={{ width: 400, borderLeft: '1px solid #e0e0e0', overflow: 'auto' }}>
-        <Box sx={{ p: 3 }}>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
-            Pricing Tips
-          </Typography>
-          
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>Profit Margins</Typography>
-            <Typography variant="body2" color="text.secondary">
-              • Aim for 30-50% profit margins for sustainable business
-              • Consider your target market's price sensitivity
-              • Factor in platform fees and marketing costs
-            </Typography>
-          </Box>
-          
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>Competitive Pricing</Typography>
-            <Typography variant="body2" color="text.secondary">
-              • Research competitor prices in your niche
-              • Position your product based on quality and uniqueness
-              • Use pricing psychology (e.g., $19.99 vs $20.00)
-            </Typography>
-          </Box>
-          
-          <Box>
-            <Typography variant="h6" sx={{ mb: 2 }}>Shipping Strategy</Typography>
-            <Typography variant="body2" color="text.secondary">
-              • Free shipping can increase conversion rates
-              • Consider bundling shipping costs into product prices
-              • Offer multiple shipping options for customer choice
-            </Typography>
-          </Box>
-        </Box>
       </Box>
     </>
   );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Paper,
@@ -7,21 +7,37 @@ import {
   Fab,
   Card,
   CardContent,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Add, Build } from '@mui/icons-material';
 import { useDesignerStore } from '../../../stores/designerStore';
-import DesignerSidebar from '../DesignerSidebar';
+import { useSidebarStore } from '../../../stores/sidebarStore';
+import EnhancedDesignerSidebar from '../EnhancedDesignerSidebar';
+import ProfessionalToolPanel from '../ProfessionalToolPanel';
+import FloatingMiniToolbar from '../FloatingMiniToolbar';
 
 const DesignView: React.FC = () => {
   const { printAreas, togglePrintArea } = useDesignerStore();
+  const { activeTool } = useSidebarStore();
+  const [showMiniToolbar, setShowMiniToolbar] = useState(false);
 
   return (
     <>
-      {/* Left Sidebar */}
-      <DesignerSidebar />
-      
-      {/* Canvas Area */}
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: 2 }}>
+      {/* Enhanced Left Sidebar */}
+      <EnhancedDesignerSidebar />
+
+      {/* Professional Tool Panel - Only show when a tool is selected */}
+      {activeTool && <ProfessionalToolPanel isVisible={true} />}
+
+      {/* Canvas Area - Now centered and clean */}
+      <Box sx={{ 
+        flex: 1, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        p: 2,
+        ml: '64px', // Account for collapsed sidebar width
+      }}>
         {/* Canvas */}
         <Box
           sx={{
@@ -34,6 +50,7 @@ const DesignView: React.FC = () => {
             justifyContent: 'center',
             mb: 2,
             position: 'relative',
+            minHeight: '60vh',
           }}
         >
           <Typography variant="h6" color="text.secondary">
@@ -68,49 +85,31 @@ const DesignView: React.FC = () => {
         </Paper>
       </Box>
 
-      {/* Right Panel - Design Tips */}
-      <Box sx={{ width: 400, borderLeft: '1px solid #e0e0e0', overflow: 'auto' }}>
-        <Box sx={{ p: 3 }}>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
-            Design Your Product
-          </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Use the tools on the left to add text, graphics, and customize your design.
-          </Typography>
-          
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 1 }}>Design Tips</Typography>
-              <Typography variant="body2" color="text.secondary">
-                • Keep text readable and appropriately sized
-                • Use high-quality images (300 DPI minimum)
-                • Consider print area limitations
-                • Test different color combinations
-              </Typography>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 1 }}>Print Areas</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Select which areas of your product will have printing:
-              </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {printAreas.map((area) => (
-                  <Chip
-                    key={area.id}
-                    label={area.name}
-                    color={area.active ? 'primary' : 'default'}
-                    onClick={() => togglePrintArea(area.id)}
-                    size="small"
-                  />
-                ))}
-              </Box>
-            </CardContent>
-          </Card>
-        </Box>
-      </Box>
+      {/* Floating Mini Toolbar Toggle */}
+      <Tooltip title="Toggle Mini Toolbar" placement="left">
+        <IconButton
+          onClick={() => setShowMiniToolbar(!showMiniToolbar)}
+          sx={{
+            position: 'fixed',
+            bottom: 20,
+            right: 20,
+            bgcolor: 'primary.main',
+            color: 'white',
+            '&:hover': {
+              bgcolor: 'primary.dark',
+            },
+            zIndex: 1000,
+          }}
+        >
+          <Build />
+        </IconButton>
+      </Tooltip>
+
+      {/* Floating Mini Toolbar */}
+      <FloatingMiniToolbar
+        isVisible={showMiniToolbar}
+        onToggleVisibility={() => setShowMiniToolbar(false)}
+      />
     </>
   );
 };

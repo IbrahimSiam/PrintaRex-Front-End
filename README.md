@@ -1,160 +1,170 @@
-# PrintaRex Frontend
+# PrintaRex Front-End
 
-A responsive landing page for the PrintaRex POD (Print on Demand) platform built with React, TypeScript, Vite, and Material UI.
+A modern, responsive e-commerce platform for custom print-on-demand products, built with React, TypeScript, and Material-UI.
 
-## Features
+## 🚀 **Quick Start**
 
-- **Responsive Design**: Mobile-first approach with Material UI components
-- **Modern UI**: Clean, airy design with smooth animations and hover effects
-- **Accessibility**: WCAG compliant with proper ARIA labels and keyboard navigation
-- **Performance**: Optimized with Vite build system
-- **Docker Ready**: Containerized deployment with Nginx
+### **Local Development**
+```bash
+# Install dependencies
+npm install
 
-## Tech Stack
+# Start development server
+npm run dev
+```
 
-- **Frontend**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **UI Framework**: Material UI (MUI) v5
-- **Routing**: React Router DOM
-- **Styling**: Emotion (CSS-in-JS)
-- **Container**: Docker + Nginx
+**Always use**: `http://localhost:5173/` for local development
 
-## Project Structure
+## 🌐 **Access Points**
+
+- **Homepage**: `http://localhost:5173/`
+- **Designer**: `http://localhost:5173/app/designer`
+- **Catalog**: `http://localhost:5173/app/catalog`
+- **Templates**: `http://localhost:5173/templates`
+
+## 🏗️ **Project Structure**
 
 ```
 src/
-├── app/
-│   └── App.tsx              # Main app with routing
-├── components/
-│   ├── layout/
-│   │   ├── Header.tsx       # Navigation header
-│   │   └── Footer.tsx       # Footer with links
-│   └── PlaceholderPage.tsx  # Placeholder for unimplemented routes
-├── pages/
-│   └── Landing.tsx          # Main landing page
-├── styles/
-│   └── globals.css          # Global styles and resets
-└── main.tsx                 # App entry point
+├── app/                 # Main app configuration
+├── components/          # Reusable UI components
+│   └── designer/       # Designer-specific components
+│       ├── views/      # Step-based design views
+│       ├── EnhancedDesignerSidebar.tsx
+│       ├── EnhancedToolPanel.tsx
+│       └── FloatingMiniToolbar.tsx
+├── pages/              # Page components
+├── stores/             # State management (Zustand)
+├── styles/             # Global styles
+└── utils/              # Utility functions
 ```
 
-## Getting Started
+## 🎨 **Enhanced Designer Features**
 
-### Prerequisites
+### **Sidebar Modes**
+- **Expanded**: Full sidebar with labels and descriptions
+- **Collapsed**: Compact rail with icons only
+- **Hidden**: Completely hidden with floating button
 
-- Node.js 18+ 
-- npm or yarn
-- Docker (for containerized deployment)
+### **Keyboard Shortcuts**
+- **T** → Text Tool
+- **G** → Graphics Library
+- **S** → Shapes
+- **L** → Layers
+- **Escape** → Hide sidebar
 
-### Development Setup
+### **Responsive Design**
+- **Desktop (≥1200px)**: Expanded by default
+- **Tablet (≥768px)**: Collapsed by default
+- **Mobile (<768px)**: Hidden with floating button
 
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+## 🔄 **Development Workflow**
 
-2. **Start development server:**
-   ```bash
-   npm run dev
-   ```
+### **Branch Strategy**
+```
+main (production)
+├── development (staging)
+└── feature/* (new features)
+```
 
-3. **Open your browser:**
-   Navigate to `http://localhost:5173`
+### **Local Development**
+1. **Always use**: `http://localhost:5173/`
+2. **No port conflicts**: Single development server
+3. **Hot reload**: Automatic updates on file changes
 
-### Build for Production
+### **GitHub Workflow**
+- **Push to `development`**: Triggers development deployment
+- **Push to `main`**: Triggers production deployment
+- **Pull Requests**: Run quality checks and tests
+
+## 📦 **Available Scripts**
 
 ```bash
-npm run build
+# Development
+npm run dev          # Start development server (localhost:5173)
+npm run build        # Build for production
+npm run preview      # Preview production build
+
+# Quality
+npm run lint         # Run ESLint
+npm run type-check   # Run TypeScript checks
+npm run test         # Run tests
+
+# Utilities
+npm run clean        # Clean build artifacts
+npm run format       # Format code with Prettier
 ```
 
-The built files will be in the `dist/` directory.
+## 🚀 **Deployment**
 
-### Docker Deployment
+### **Development Environment**
+- **Trigger**: Push to `development` branch
+- **Automated**: GitHub Actions workflow
+- **Tests**: Linting, type checking, unit tests
+- **Build**: Production-ready build
 
-1. **Build and run with Docker Compose:**
-   ```bash
-   docker-compose up --build
-   ```
+### **Production Environment**
+- **Trigger**: Push to `main` branch
+- **Requirements**: All tests must pass
+- **Security**: Security audit included
+- **Deployment**: Automated production deployment
 
-2. **Access the application:**
-   Navigate to `http://localhost:5173`
+## 🛠️ **Tech Stack**
 
-3. **Stop the containers:**
-   ```bash
-   docker-compose down
-   ```
+- **Frontend**: React 18 + TypeScript
+- **UI Framework**: Material-UI v5
+- **State Management**: Zustand
+- **Build Tool**: Vite
+- **Styling**: CSS Modules + Material-UI
+- **Routing**: React Router v6
+- **Testing**: Vitest + Testing Library
 
-## Available Routes
+## 🔧 **Configuration**
 
-- `/` - Landing page (implemented)
-- `/app/catalog` - Product catalog (placeholder)
-- `/app/designer` - Product designer (placeholder)
-- `/pricing` - Pricing information (placeholder)
-- `/support` - Support center (placeholder)
-- `/legal/terms` - Terms of service (placeholder)
-- `/legal/privacy` - Privacy policy (placeholder)
-- `/contact` - Contact information (placeholder)
+### **Environment Variables**
+```bash
+# Development
+VITE_API_URL=http://localhost:3000
+VITE_ENV=development
 
-## Features Implemented
+# Production
+VITE_API_URL=https://api.printarex.com
+VITE_ENV=production
+```
 
-### Header Navigation
-- PrintaRex logo with inline SVG
-- Sticky navigation with subtle border
-- Mobile-responsive drawer menu
-- Navigation to Catalog, Pricing, and Support
+### **Vite Configuration**
+- **Port**: 5173 (fixed)
+- **Host**: 0.0.0.0 (network accessible)
+- **HTTPS**: Disabled for local development
+- **HMR**: Hot Module Replacement enabled
 
-### Hero Section
-- Large headline: "Create and sell custom products"
-- Feature points with check icons
-- Primary CTA: "Start customizing"
-- Secondary CTA: "Browse catalog"
-- GIF demonstration area for T-shirts and hoodies
+## 📱 **Browser Support**
 
-### Product Teaser Grid
-- "Popular to customize" section
-- Product cards with hover effects
-- Customize buttons linking to designer
+- **Chrome**: 90+
+- **Firefox**: 88+
+- **Safari**: 14+
+- **Edge**: 90+
 
-### Footer
-- Copyright information
-- Legal links (Terms, Privacy, Contact)
+## 🤝 **Contributing**
 
-## Accessibility Features
+1. **Create feature branch**: `git checkout -b feature/amazing-feature`
+2. **Make changes**: Develop and test locally
+3. **Commit changes**: `git commit -m 'Add amazing feature'`
+4. **Push to branch**: `git push origin feature/amazing-feature`
+5. **Create PR**: Merge to `development` branch
 
-- Semantic HTML structure
-- ARIA labels for interactive elements
-- Keyboard navigation support
-- Focus rings for all interactive elements
-- Alt text for all images and GIFs
-- Minimum 44px tap targets for mobile
+## 📄 **License**
 
-## Performance Optimizations
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-- Lazy loading of components
-- Optimized Material UI bundle
-- Gzip compression in production
-- Static asset caching
-- Source maps for debugging
+## 🆘 **Support**
 
-## Browser Support
+- **Documentation**: Check this README first
+- **Issues**: Create GitHub issue with detailed description
+- **Development**: Use `http://localhost:5173/` for local testing
+- **Deployment**: Check GitHub Actions for deployment status
 
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+---
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Ensure accessibility compliance
-5. Submit a pull request
-
-## License
-
-This project is proprietary to PrintaRex.
-
-## Support
-
-For support and questions, please contact the development team.
+**Remember**: Always use `http://localhost:5173/` for local development! 🎯
 
