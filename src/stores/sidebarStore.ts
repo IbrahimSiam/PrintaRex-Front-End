@@ -1,20 +1,26 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export type RailState = 'expanded' | 'mini' | 'auto';
+
 interface SidebarState {
   // Tool selection
   activeTool: string | null;
   setActiveTool: (tool: string | null) => void;
   
-  // Sidebar state
-  isCollapsed: boolean;
-  setIsCollapsed: (collapsed: boolean) => void;
+  // Rail state and behavior
+  railState: RailState;
+  setRailState: (state: RailState) => void;
   
-  // Pin functionality
-  isPinned: boolean;
-  setIsPinned: (pinned: boolean) => void;
+  // Rail dimensions
+  railWidth: number;
+  setRailWidth: (width: number) => void;
   
-  // Labels visibility
+  // Hover state for auto mode
+  isHoverExpanded: boolean;
+  setIsHoverExpanded: (expanded: boolean) => void;
+  
+  // Labels visibility (only for expanded state)
   showLabels: boolean;
   setShowLabels: (show: boolean) => void;
   
@@ -22,8 +28,16 @@ interface SidebarState {
   autoCollapseOnMobile: boolean;
   setAutoCollapseOnMobile: (enabled: boolean) => void;
   
+  // Toast notification state
+  hasShownCollapseToast: boolean;
+  setHasShownCollapseToast: (shown: boolean) => void;
+  
   // Reset state
   resetSidebar: () => void;
+  
+  // Computed values
+  getEffectiveWidth: () => number;
+  getEffectiveState: () => 'expanded' | 'mini';
 }
 
 export const useSidebarStore = create<SidebarState>()(
@@ -33,15 +47,19 @@ export const useSidebarStore = create<SidebarState>()(
       activeTool: null,
       setActiveTool: (tool) => set({ activeTool: tool }),
       
-      // Sidebar state
-      isCollapsed: false,
-      setIsCollapsed: (collapsed) => set({ isCollapsed: collapsed }),
+      // Rail state and behavior
+      railState: 'mini',
+      setRailState: (state) => set({ railState: state }),
       
-      // Pin functionality
-      isPinned: false,
-      setIsPinned: (pinned) => set({ isPinned: pinned }),
+      // Rail dimensions
+      railWidth: 280,
+      setRailWidth: (width) => set({ railWidth: Math.max(240, Math.min(360, width)) }),
       
-      // Labels visibility
+      // Hover state for auto mode
+      isHoverExpanded: false,
+      setIsHoverExpanded: (expanded) => set({ isHoverExpanded: expanded }),
+      
+      // Labels visibility (only for expanded state)
       showLabels: true,
       setShowLabels: (show) => set({ showLabels: show }),
       
@@ -49,22 +67,46 @@ export const useSidebarStore = create<SidebarState>()(
       autoCollapseOnMobile: true,
       setAutoCollapseOnMobile: (enabled) => set({ autoCollapseOnMobile: enabled }),
       
+      // Toast notification state
+      hasShownCollapseToast: false,
+      setHasShownCollapseToast: (shown) => set({ hasShownCollapseToast: shown }),
+      
       // Reset state
       resetSidebar: () => set({
         activeTool: null,
-        isCollapsed: false,
-        isPinned: false,
+        railState: 'mini',
+        railWidth: 280,
+        isHoverExpanded: false,
         showLabels: true,
-        autoCollapseOnMobile: true
+        autoCollapseOnMobile: true,
+        hasShownCollapseToast: false
       }),
+      
+      // Computed values
+      getEffectiveWidth: () => {
+        const { railState, railWidth, isHoverExpanded } = get();
+        if (railState === 'expanded' || (railState === 'auto' && isHoverExpanded)) {
+          return railWidth;
+        }
+        return 64; // mini width
+      },
+      
+      getEffectiveState: () => {
+        const { railState, isHoverExpanded } = get();
+        if (railState === 'expanded' || (railState === 'auto' && isHoverExpanded)) {
+          return 'expanded';
+        }
+        return 'mini';
+      }
     }),
     {
       name: 'sidebar-storage',
       partialize: (state) => ({
-        isCollapsed: state.isCollapsed,
-        isPinned: state.isPinned,
+        railState: state.railState,
+        railWidth: state.railWidth,
         showLabels: state.showLabels,
-        autoCollapseOnMobile: state.autoCollapseOnMobile
+        autoCollapseOnMobile: state.autoCollapseOnMobile,
+        hasShownCollapseToast: state.hasShownCollapseToast
       }),
     }
   )

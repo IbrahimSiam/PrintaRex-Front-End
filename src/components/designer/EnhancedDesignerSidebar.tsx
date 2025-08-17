@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box, Drawer, List, ListItem, ListItemIcon, ListItemButton,
   Typography, useTheme, useMediaQuery, Tooltip, IconButton, Divider, Fade,
   Slide, Fab, Menu, MenuItem, FormControlLabel, Switch, Slider, Collapse,
-  Paper, Badge, Chip
+  Paper, Badge, Chip, Menu as MenuIcon
 } from '@mui/material';
 import {
   Checkroom, CloudUpload, TextFields, ViewModule, Image, Layers,
   Person, Folder, GridOn, Search, CropSquare, Settings, Help,
   ChevronLeft, ChevronRight, PushPin, PushPinOutlined, ExpandMore,
-  ExpandLess, Add, Remove, Palette, Brush, AutoAwesome, Star
+  ExpandLess, Add, Remove, Palette, Brush, AutoAwesome, Star,
+  MoreVert
 } from '@mui/icons-material';
-import { useSidebarStore } from '../../stores/sidebarStore';
+import { useSidebarStore, RailState } from '../../stores/sidebarStore';
 
 interface SidebarItem {
   id: string;
@@ -49,16 +50,24 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
 const EnhancedDesignerSidebar: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
   
   const { 
     activeTool, 
     setActiveTool, 
-    isCollapsed, 
-    setIsCollapsed,
-    isPinned,
-    setIsPinned,
-    showLabels,
-    setShowLabels
+    railState,
+    setRailState,
+    railWidth,
+    setRailWidth,
+    isHoverExpanded,
+    setIsHoverExpanded,
+    showLabels, 
+    setShowLabels,
+    autoCollapseOnMobile,
+    hasShownCollapseToast,
+    setHasShownCollapseToast,
+    getEffectiveWidth,
+    getEffectiveState
   } = useSidebarStore();
 
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -67,16 +76,93 @@ const EnhancedDesignerSidebar: React.FC = () => {
     product: true,
     settings: true
   });
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [hoverTimer, setHoverTimer] = useState<number | null>(null);
+  const [isResizing, setIsResizing] = useState(false);
+  const [startResizeX, setStartResizeX] = useState(0);
+  const [startResizeWidth, setStartResizeWidth] = useState(0);
 
-  const sidebarWidth = isCollapsed ? 64 : 240;
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const effectiveWidth = getEffectiveWidth();
+  const effectiveState = getEffectiveState();
+  const isExpanded = effectiveState === 'expanded';
   const iconSize = 24;
+
+  // Auto-collapse on small screens
+  useEffect(() => {
+    if (isSmallScreen && railState === 'expanded' && !hasShownCollapseToast) {
+      setRailState('mini');
+      setHasShownCollapseToast(true);
+    }
+  }, [isSmallScreen, railState, hasShownCollapseToast, setRailState, setHasShownCollapseToast]);
+
+  // Hover behavior for auto mode
+  const handleMouseEnter = useCallback(() => {
+    if (railState === 'auto') {
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+        setHoverTimer(null);
+      }
+      
+      const timer = setTimeout(() => {
+        setIsHoverExpanded(true);
+      }, 500); // 500ms delay
+      
+      setHoverTimer(timer);
+    }
+  }, [railState, hoverTimer, setIsHoverExpanded]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (railState === 'auto') {
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+        setHoverTimer(null);
+      }
+      
+      const timer = setTimeout(() => {
+        setIsHoverExpanded(false);
+      }, 200); // 200ms delay before closing
+      
+      setHoverTimer(timer);
+    }
+  }, [railState, hoverTimer, setIsHoverExpanded]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+      }
+    };
+  }, [hoverTimer]);
 
   const handleToolClick = (toolId: string) => {
     setActiveTool(toolId);
     // Auto-collapse on mobile after selection
-    if (isMobile && !isPinned) {
-      setIsCollapsed(true);
+    if (isMobile && railState === 'auto') {
+      setIsHoverExpanded(false);
     }
+  };
+
+  const handleExpand = () => {
+    setRailState('expanded');
+    setIsHoverExpanded(false);
+  };
+
+  const handleCollapse = () => {
+    setRailState('mini');
+    setIsHoverExpanded(false);
+  };
+
+  const handlePin = () => {
+    setRailState('expanded');
+    setIsHoverExpanded(false);
+  };
+
+  const handleRailBehaviorChange = (newState: RailState) => {
+    setRailState(newState);
+    setIsHoverExpanded(false);
+    setMenuAnchor(null);
   };
 
   const toggleCategory = (category: keyof typeof expandedCategories) => {
@@ -86,6 +172,39 @@ const EnhancedDesignerSidebar: React.FC = () => {
     }));
   };
 
+  // Resize functionality
+  const handleResizeStart = (e: React.MouseEvent) => {
+    if (isExpanded) {
+      setIsResizing(true);
+      setStartResizeX(e.clientX);
+      setStartResizeWidth(railWidth);
+      e.preventDefault();
+    }
+  };
+
+  const handleResizeMove = useCallback((e: MouseEvent) => {
+    if (isResizing) {
+      const deltaX = e.clientX - startResizeX;
+      const newWidth = Math.max(240, Math.min(360, startResizeWidth + deltaX));
+      setRailWidth(newWidth);
+    }
+  }, [isResizing, startResizeX, startResizeWidth, setRailWidth]);
+
+  const handleResizeEnd = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleResizeMove);
+      document.addEventListener('mouseup', handleResizeEnd);
+      return () => {
+        document.removeEventListener('mousemove', handleResizeMove);
+        document.removeEventListener('mouseup', handleResizeEnd);
+      };
+    }
+  }, [isResizing, handleResizeMove, handleResizeEnd]);
+
   const renderSidebarItem = (item: SidebarItem) => {
     const isActive = activeTool === item.id;
     const isHovered = hoveredItem === item.id;
@@ -94,7 +213,7 @@ const EnhancedDesignerSidebar: React.FC = () => {
       <Tooltip
         title={item.label}
         placement="right"
-        disableHoverListener={!isCollapsed && showLabels}
+        disableHoverListener={isExpanded && showLabels}
         arrow
       >
         <ListItem
@@ -113,7 +232,7 @@ const EnhancedDesignerSidebar: React.FC = () => {
             disabled={item.disabled}
             sx={{
               minHeight: 48,
-              px: isCollapsed ? 2 : 3,
+              px: isExpanded ? 3 : 2,
               py: 1.5,
               borderRadius: 2,
               transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -143,7 +262,7 @@ const EnhancedDesignerSidebar: React.FC = () => {
           >
             <ListItemIcon
               sx={{
-                minWidth: isCollapsed ? 'auto' : 40,
+                minWidth: isExpanded ? 40 : 'auto',
                 color: 'inherit',
                 '& .MuiSvgIcon-root': {
                   fontSize: iconSize,
@@ -160,7 +279,7 @@ const EnhancedDesignerSidebar: React.FC = () => {
               )}
             </ListItemIcon>
             
-            {(!isCollapsed && showLabels) && (
+            {isExpanded && showLabels && (
               <Typography
                 variant="body2"
                 sx={{
@@ -190,7 +309,7 @@ const EnhancedDesignerSidebar: React.FC = () => {
 
     return (
       <Box key={category}>
-        {(!isCollapsed && showLabels) && (
+        {isExpanded && showLabels && (
           <Box
             onClick={() => toggleCategory(category)}
             sx={{
@@ -221,19 +340,18 @@ const EnhancedDesignerSidebar: React.FC = () => {
           </Box>
         )}
         
-        <Collapse in={expandedCategories[category]}>
+        <Collapse in={isExpanded ? expandedCategories[category] : true}>
           <List disablePadding>
             {items.map(renderSidebarItem)}
           </List>
         </Collapse>
         
-        {category !== 'settings' && (
+        {category !== 'settings' && isExpanded && (
           <Divider 
             sx={{ 
               my: 2, 
               mx: 2, 
-              opacity: 0.3,
-              display: isCollapsed ? 'none' : 'block'
+              opacity: 0.3
             }} 
           />
         )}
@@ -249,21 +367,42 @@ const EnhancedDesignerSidebar: React.FC = () => {
 
   return (
     <>
+      {/* Hover hot-zone for auto mode */}
+      {railState === 'auto' && (
+        <Box
+          sx={{
+            position: 'fixed',
+            left: 0,
+            top: 0,
+            width: 16,
+            height: '100vh',
+            zIndex: 1199,
+            cursor: 'pointer'
+          }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        />
+      )}
+
       {/* Main Sidebar */}
       <Drawer
         variant="permanent"
+        ref={sidebarRef}
         sx={{
-          width: sidebarWidth,
+          width: effectiveWidth,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: sidebarWidth,
+            width: effectiveWidth,
             backgroundColor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
             borderRight: `1px solid ${theme.palette.divider}`,
-            transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: `width ${railState === 'auto' ? '0.16s' : '0.2s'} cubic-bezier(0.4, 0, 0.2, 1)`,
             overflow: 'hidden',
-            boxShadow: '2px 0 8px rgba(0,0,0,0.1)'
+            boxShadow: isExpanded ? '2px 0 8px rgba(0,0,0,0.1)' : 'none',
+            position: 'relative'
           }
         }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         {/* Sidebar Header */}
         <Box
@@ -276,7 +415,7 @@ const EnhancedDesignerSidebar: React.FC = () => {
             minHeight: 64
           }}
         >
-          {!isCollapsed && (
+          {isExpanded && (
             <Typography
               variant="h6"
               sx={{
@@ -289,36 +428,75 @@ const EnhancedDesignerSidebar: React.FC = () => {
             </Typography>
           )}
           
-          <Box sx={{ display: 'flex', gap: 0.5 }}>
-            <Tooltip title={isPinned ? 'Unpin Sidebar' : 'Pin Sidebar'}>
-              <IconButton
-                size="small"
-                onClick={() => setIsPinned(!isPinned)}
-                sx={{
-                  color: isPinned ? 'primary.main' : 'text.secondary',
-                  '&:hover': {
-                    backgroundColor: 'action.hover'
-                  }
-                }}
-              >
-                {isPinned ? <PushPin /> : <PushPinOutlined />}
-              </IconButton>
-            </Tooltip>
-            
-            <Tooltip title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}>
-              <IconButton
-                size="small"
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                sx={{
-                  color: 'text.secondary',
-                  '&:hover': {
-                    backgroundColor: 'action.hover'
-                  }
-                }}
-              >
-                {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
-              </IconButton>
-            </Tooltip>
+          <Box sx={{ display: 'flex', gap: 0.5, ml: 'auto' }}>
+            {/* Expand/Collapse Button */}
+            {!isExpanded ? (
+              <Tooltip title="Expand tools" placement="right">
+                <IconButton
+                  size="small"
+                  onClick={handleExpand}
+                  sx={{
+                    color: 'text.secondary',
+                    '&:hover': {
+                      backgroundColor: 'action.hover'
+                    }
+                  }}
+                >
+                  <ChevronRight />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Collapse tools" placement="right">
+                <IconButton
+                  size="small"
+                  onClick={handleCollapse}
+                  sx={{
+                    color: 'text.secondary',
+                    '&:hover': {
+                      backgroundColor: 'action.hover'
+                    }
+                  }}
+                >
+                  <ChevronLeft />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {/* Pin Button (only when expanded) */}
+            {isExpanded && (
+              <Tooltip title={railState === 'expanded' ? 'Unpin' : 'Keep open'} placement="right">
+                <IconButton
+                  size="small"
+                  onClick={handlePin}
+                  sx={{
+                    color: railState === 'expanded' ? 'primary.main' : 'text.secondary',
+                    '&:hover': {
+                      backgroundColor: 'action.hover'
+                    }
+                  }}
+                >
+                  <PushPin />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {/* Settings Menu */}
+            {isExpanded && (
+              <Tooltip title="Rail behavior" placement="right">
+                <IconButton
+                  size="small"
+                  onClick={(e) => setMenuAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    '&:hover': {
+                      backgroundColor: 'action.hover'
+                    }
+                  }}
+                >
+                  <MoreVert />
+                </IconButton>
+              </Tooltip>
+            )}
           </Box>
         </Box>
 
@@ -336,7 +514,7 @@ const EnhancedDesignerSidebar: React.FC = () => {
         </Box>
 
         {/* Sidebar Footer */}
-        {!isCollapsed && (
+        {isExpanded && (
           <Box
             sx={{
               p: 2,
@@ -362,7 +540,54 @@ const EnhancedDesignerSidebar: React.FC = () => {
             />
           </Box>
         )}
+
+        {/* Resize Handle */}
+        {isExpanded && (
+          <Box
+            sx={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              width: 4,
+              height: '100%',
+              cursor: 'col-resize',
+              '&:hover': {
+                backgroundColor: 'primary.main',
+                opacity: 0.3
+              }
+            }}
+            onMouseDown={handleResizeStart}
+          />
+        )}
       </Drawer>
+
+      {/* Settings Menu */}
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={() => setMenuAnchor(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <MenuItem onClick={() => handleRailBehaviorChange('auto')}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2">Auto</Typography>
+            {railState === 'auto' && <Typography variant="caption" color="primary">✓</Typography>}
+          </Box>
+        </MenuItem>
+        <MenuItem onClick={() => handleRailBehaviorChange('expanded')}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2">Pinned</Typography>
+            {railState === 'expanded' && <Typography variant="caption" color="primary">✓</Typography>}
+          </Box>
+        </MenuItem>
+        <MenuItem onClick={() => handleRailBehaviorChange('mini')}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2">Mini</Typography>
+            {railState === 'mini' && <Typography variant="caption" color="primary">✓</Typography>}
+          </Box>
+        </MenuItem>
+      </Menu>
 
       {/* Floating Tool Panel (Right Side) */}
       {activeTool && (
