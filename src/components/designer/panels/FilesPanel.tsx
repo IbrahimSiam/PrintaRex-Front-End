@@ -10,11 +10,11 @@ import {
   Cloud, CloudQueue, FileCopy, Image, PictureAsPdf, Brush
 } from '@mui/icons-material';
 import { useDesignerUIStore } from '../../../stores/designerUIStore';
-import { useCanvasService } from '../../../services/canvasService';
+import { useDesignerContext } from '../DesignerProvider';
 
 const FilesPanel: React.FC = () => {
   const { assets, addAsset, removeAsset, updateAsset } = useDesignerUIStore();
-  const canvasService = useCanvasService();
+  const { addImage } = useDesignerContext();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [hideUsed, setHideUsed] = useState(false);
@@ -106,12 +106,9 @@ const FilesPanel: React.FC = () => {
 
   // Handle asset insertion
   const handleInsertAsset = useCallback((asset: any) => {
-    canvasService.addImage({
-      url: asset.url,
-      name: asset.name,
-      metadata: { assetId: asset.id }
-    });
-  }, [canvasService]);
+    // Insert into canvas via designer store
+    addImage({ src: asset.url });
+  }, [addImage]);
 
   // Handle asset actions
   const handleAssetAction = useCallback((action: string, asset: any) => {

@@ -17,8 +17,24 @@ import BrushesPanel from './panels/BrushesPanel';
 import ProductPanel from './panels/ProductPanel';
 import SettingsPanel from './panels/SettingsPanel';
 import HelpPanel from './panels/HelpPanel';
+import SelectedInspector from './SelectedInspector';
 
-const RightPanel: React.FC = () => {
+interface ProductData {
+  id: number;
+  name: string;
+  type: string;
+  color: string;
+  size: string;
+  technology: string;
+  image: string;
+  printAreas: string[];
+}
+
+interface RightPanelProps {
+  productData?: ProductData;
+}
+
+const RightPanel: React.FC<RightPanelProps> = ({ productData }) => {
   const { panels, closePanel } = useDesignerUIStore();
   const { tool } = panels;
 
@@ -57,13 +73,7 @@ const RightPanel: React.FC = () => {
       case 'help':
         return <HelpPanel />;
       default:
-        return (
-          <Box sx={{ p: 3 }}>
-            <Typography variant="body2" color="text.secondary">
-              Tool panel not implemented for: {tool}
-            </Typography>
-          </Box>
-        );
+        return <SelectedInspector />;
     }
   };
 
@@ -85,7 +95,7 @@ const RightPanel: React.FC = () => {
       settings: 'Settings',
       help: 'Help'
     };
-    return titles[tool] || tool;
+    return titles[tool] || 'Properties';
   };
 
   return (

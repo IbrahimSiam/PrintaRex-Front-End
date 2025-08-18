@@ -1,11 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, Paper, Button, Grid, Card, CardContent, Chip, TextField, FormControl, InputLabel, Select, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Slider, Divider, Alert, Tooltip, useTheme, useMediaQuery } from '@mui/material';
 import { useDesignerStore } from '../../stores/designerStore';
 import { TrendingUp, LocalShipping, Build, AttachMoney, ShowChart, Info } from '@mui/icons-material';
+import CanvasStage from './CanvasStage';
+import DesignerProvider from './DesignerProvider';
 
-const DesignerContent: React.FC = () => {
+interface ProductData {
+  id: number;
+  name: string;
+  type: string;
+  color: string;
+  size: string;
+  technology: string;
+  image: string;
+  printAreas: string[];
+}
+
+interface DesignerContentProps {
+  productData?: ProductData;
+}
+
+const DesignerContent: React.FC<DesignerContentProps> = ({ productData }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
   
   const [pricingData, setPricingData] = useState([
     { size: 'S', retail: 29.99, cost: 12.50, shipping: 5.99, profit: 11.50 },
@@ -93,20 +111,36 @@ const DesignerContent: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            position: 'relative'
+            position: 'relative',
+            overflow: 'hidden'
           }}
         >
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h4" sx={{ mb: 2, color: '#6c757d' }}>
-              Design Canvas
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-              Use the tools on the left to create your t-shirt design
-            </Typography>
-            <Button variant="contained" size="large">
-              Start Designing
-            </Button>
-          </Box>
+          {productData ? (
+            <DesignerProvider>
+              <Box 
+                ref={canvasContainerRef}
+                sx={{ 
+                  width: '100%', 
+                  height: '100%',
+                  position: 'relative'
+                }}
+              >
+                <CanvasStage containerRef={canvasContainerRef} />
+              </Box>
+            </DesignerProvider>
+          ) : (
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="h4" sx={{ mb: 2, color: '#6c757d' }}>
+                Design Canvas
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                Use the tools on the left to create your t-shirt design
+              </Typography>
+              <Button variant="contained" size="large">
+                Start Designing
+              </Button>
+            </Box>
+          )}
         </Paper>
         
         {/* Print Areas Footer */}
@@ -409,7 +443,7 @@ const DesignerContent: React.FC = () => {
                       }
                     }}
                     inputProps={{ 
-                      style: { textAlign: 'center', fontWeight: 'bold' }
+                      style: { textAlign: 'center', fontWeight: 'bold' } 
                     }}
                   />
                 </Box>

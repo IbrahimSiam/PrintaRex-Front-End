@@ -44,6 +44,21 @@ export interface DesignerUIState {
     payload?: any;
   };
   
+  // Stage transform state for React-Konva
+  stage: {
+    scale: number;
+    x: number;
+    y: number;
+  };
+  
+  // Canvas display options
+  canvas: {
+    snapping: boolean;
+    showGrid: boolean;
+    showGuides: boolean;
+    showPrintArea: boolean;
+  };
+  
   // Assets management
   assets: {
     images: Asset[];
@@ -60,6 +75,16 @@ export interface DesignerUIState {
   toggleSidebar: () => void;
   openPanel: (toolId: ToolId, payload?: any) => void;
   closePanel: () => void;
+  
+  // Stage transform actions
+  setStageTransform: (transform: Partial<Pick<DesignerUIState['stage'], 'scale' | 'x' | 'y'>>) => void;
+  resetStageTransform: () => void;
+  
+  // Canvas display actions
+  setSnapping: (enabled: boolean) => void;
+  setShowGrid: (enabled: boolean) => void;
+  setShowGuides: (enabled: boolean) => void;
+  setShowPrintArea: (enabled: boolean) => void;
   
   // Asset actions
   addAsset: (asset: Omit<Asset, 'id' | 'createdAt' | 'usedCount'>) => void;
@@ -116,6 +141,19 @@ export const useDesignerUIStore = create<DesignerUIState>()(
         payload: undefined,
       },
       
+      stage: {
+        scale: 1,
+        x: 0,
+        y: 0,
+      },
+      
+      canvas: {
+        snapping: true,
+        showGrid: false,
+        showGuides: true,
+        showPrintArea: true,
+      },
+      
       assets: {
         images: [],
         palettes: INITIAL_PALETTES,
@@ -157,6 +195,44 @@ export const useDesignerUIStore = create<DesignerUIState>()(
         set((state) => ({
           sidebar: { ...state.sidebar, activeToolId: null },
           panels: { tool: null, payload: undefined }
+        }));
+      },
+      
+      // Stage transform actions
+      setStageTransform: (transform) => {
+        set((state) => ({
+          stage: { ...state.stage, ...transform }
+        }));
+      },
+      
+      resetStageTransform: () => {
+        set((state) => ({
+          stage: { scale: 1, x: 0, y: 0 }
+        }));
+      },
+      
+      // Canvas display actions
+      setSnapping: (enabled) => {
+        set((state) => ({
+          canvas: { ...state.canvas, snapping: enabled }
+        }));
+      },
+      
+      setShowGrid: (enabled) => {
+        set((state) => ({
+          canvas: { ...state.canvas, showGrid: enabled }
+        }));
+      },
+      
+      setShowGuides: (enabled) => {
+        set((state) => ({
+          canvas: { ...state.canvas, showGuides: enabled }
+        }));
+      },
+      
+      setShowPrintArea: (enabled) => {
+        set((state) => ({
+          canvas: { ...state.canvas, showPrintArea: enabled }
         }));
       },
       
@@ -288,6 +364,8 @@ export const useDesignerUIStore = create<DesignerUIState>()(
       name: 'designer-ui-storage',
       partialize: (state) => ({
         sidebar: state.sidebar,
+        stage: state.stage,
+        canvas: state.canvas,
         assets: state.assets,
       }),
     }

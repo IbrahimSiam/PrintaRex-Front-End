@@ -10,6 +10,22 @@ import {
   ChevronRight, AutoAwesome, Brush, Palette, ExpandMore, ExpandLess
 } from '@mui/icons-material';
 import { useDesignerUIStore } from '../../stores/designerUIStore';
+import { useDesignerContext } from './DesignerProvider';
+
+interface ProductData {
+  id: number;
+  name: string;
+  type: string;
+  color: string;
+  size: string;
+  technology: string;
+  image: string;
+  printAreas: string[];
+}
+
+interface EnhancedDesignerSidebarProps {
+  productData?: ProductData;
+}
 
 interface SidebarItem {
   id: string;
@@ -58,7 +74,7 @@ const SIDEBAR_GROUPS = [
   }
 ];
 
-const EnhancedDesignerSidebar: React.FC = () => {
+const EnhancedDesignerSidebar: React.FC<EnhancedDesignerSidebarProps> = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
@@ -67,6 +83,12 @@ const EnhancedDesignerSidebar: React.FC = () => {
     setActiveTool,
     toggleSidebar
   } = useDesignerUIStore();
+  
+  const {
+    addText,
+    addShape,
+    addImage
+  } = useDesignerContext();
 
   const [expandedCategories, setExpandedCategories] = useState({
     product: true,
@@ -91,6 +113,27 @@ const EnhancedDesignerSidebar: React.FC = () => {
 
   const handleToolClick = (toolId: string) => {
     setActiveTool(toolId as any);
+    
+    // Dispatch designer actions based on tool selection
+    switch (toolId) {
+      case 'text':
+        addText();
+        break;
+      case 'shapes':
+        addShape({ shape: 'rect' });
+        break;
+      case 'graphics':
+        // This will trigger the right drawer for file uploads
+        console.log('Graphics tool selected - should open file uploads');
+        break;
+      case 'files':
+        // This will trigger the right drawer for file uploads
+        console.log('Files tool selected - should open file uploads');
+        break;
+      default:
+        // For other tools, just set the active tool
+        break;
+    }
   };
 
   const getEffectiveWidth = () => {

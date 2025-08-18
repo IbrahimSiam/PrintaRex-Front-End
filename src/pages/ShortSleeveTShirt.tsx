@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUIStore } from '../stores/uiStore';
+import { PrintView } from '../stores/designerStore';
 
 // TSHIRT_VARIANTS data model - using actual .webp images for each color
 const TSHIRT_VARIANTS = {
@@ -52,6 +53,16 @@ const TSHIRT_VARIANTS = {
 
 // Define all available view types
 type ViewType = 'front' | 'back' | 'side-left' | 'side-right' | 'closeup' | 'lifestyle';
+
+// Map view types to PrintView
+const viewToPrintView: Record<string, PrintView> = {
+  'front': 'front',
+  'back': 'back',
+  'side-left': 'leftSleeve',
+  'side-right': 'rightSleeve',
+  'closeup': 'innerNeck',
+  'lifestyle': 'outerNeck'
+};
 
 // T-shirt icon component with shared outline and specific print areas
 const TShirtIcon: React.FC<{
@@ -1092,6 +1103,58 @@ const ShortSleeveTShirt: React.FC = () => {
     return product.shipping[selectedCountry as keyof typeof product.shipping]?.price || 0;
   };
 
+  // Handle Start Designing with product data
+  const handleStartDesigning = () => {
+    // Create product data object with current selections matching designer store interface
+    const productData = {
+      productId: product.id,
+      productName: product.name,
+      color: selectedColor,
+      sizeRange: ['S', 'M', 'L', 'XL', 'XXL'],
+      technology: selectedTechnology,
+      assetsByColor: {
+        [selectedColor]: [
+          {
+            view: 'front' as PrintView,
+            src: TSHIRT_VARIANTS[selectedColor].front,
+            printArea: { x: 100, y: 100, width: 800, height: 800 }
+          },
+          {
+            view: 'back' as PrintView,
+            src: TSHIRT_VARIANTS[selectedColor].back,
+            printArea: { x: 100, y: 100, width: 800, height: 800 }
+          },
+          {
+            view: 'leftSleeve' as PrintView,
+            src: TSHIRT_VARIANTS[selectedColor]['side-left'],
+            printArea: { x: 50, y: 50, width: 400, height: 400 }
+          },
+          {
+            view: 'rightSleeve' as PrintView,
+            src: TSHIRT_VARIANTS[selectedColor]['side-right'],
+            printArea: { x: 50, y: 50, width: 400, height: 400 }
+          },
+          {
+            view: 'innerNeck' as PrintView,
+            src: TSHIRT_VARIANTS[selectedColor].closeup,
+            printArea: { x: 25, y: 25, width: 200, height: 200 }
+          },
+          {
+            view: 'outerNeck' as PrintView,
+            src: TSHIRT_VARIANTS[selectedColor].closeup,
+            printArea: { x: 25, y: 25, width: 200, height: 200 }
+          }
+        ]
+      },
+      initialView: 'front'
+    };
+    
+    // Navigate to designer with product data
+    navigate('/app/designer', { 
+      state: { product: productData } 
+    });
+  };
+
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
       {/* Desktop Sidebar */}
@@ -1424,7 +1487,7 @@ const ShortSleeveTShirt: React.FC = () => {
                       fullWidth
                       size="medium"
                       startIcon={<Print />}
-                      onClick={() => navigate('/app/designer')}
+                      onClick={handleStartDesigning}
                       sx={{
                         borderRadius: 2,
                         textTransform: 'none',
@@ -1535,7 +1598,7 @@ const ShortSleeveTShirt: React.FC = () => {
             <PrintAreasAccordion />
 
             {/* Fulfillment Section */}
-                         <FulfillmentOptionsAccordion onStartDesigning={() => navigate('/app/designer')} />
+                         <FulfillmentOptionsAccordion onStartDesigning={handleStartDesigning} />
 
             {/* Reviews Section */}
             <CustomerReviewsAccordion />
